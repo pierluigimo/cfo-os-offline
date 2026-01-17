@@ -1,0 +1,1387 @@
+<!doctype html>
+<html lang="it">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Black Swan CFO OS — Offline</title>
+
+  <!-- PWA -->
+  <meta name="theme-color" content="#0b0f14" />
+  <link rel="manifest" href="manifest.json">
+
+  <style>
+    :root{
+      --bg:#0b0f14; --card:#121826; --muted:#94a3b8; --text:#e5e7eb;
+      --accent:#d4af37; --ok:#22c55e; --bad:#ef4444; --warn:#f59e0b;
+      --line:#233044; --chip:#0f172a;
+      --radius:18px;
+      --shadow: 0 10px 30px rgba(0,0,0,.35);
+    }
+    *{box-sizing:border-box}
+    body{
+      margin:0; background: radial-gradient(1200px 700px at 20% -10%, rgba(212,175,55,.18), transparent 60%),
+                      radial-gradient(900px 600px at 100% 10%, rgba(59,130,246,.12), transparent 55%),
+                      var(--bg);
+      color:var(--text);
+      font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, "Apple Color Emoji","Segoe UI Emoji";
+      line-height:1.35;
+    }
+    .wrap{max-width:1220px; margin:0 auto; padding:22px}
+    .topbar{
+      display:flex; gap:14px; align-items:center; justify-content:space-between;
+      padding:16px 18px; border:1px solid var(--line); border-radius:var(--radius);
+      background: linear-gradient(180deg, rgba(18,24,38,.86), rgba(18,24,38,.62));
+      box-shadow:var(--shadow);
+    }
+    .brand{display:flex; gap:14px; align-items:center; min-width:0;}
+    .logo{
+      width:44px; height:44px; border-radius:14px;
+      background: #000; border:1px solid rgba(212,175,55,.55);
+      display:grid; place-items:center; flex:0 0 auto;
+      box-shadow: 0 12px 22px rgba(0,0,0,.35);
+    }
+    .logo span{color:var(--accent); font-weight:800}
+    .titles{min-width:0}
+    .titles h1{margin:0; font-size:16px; letter-spacing:.02em; white-space:normal;}
+    .titles p{margin:2px 0 0; color:var(--muted); font-size:12px; white-space:normal;}
+    .controls{display:flex; gap:10px; flex-wrap:wrap; justify-content:flex-end; align-items:center;}
+    .ctrl{
+      display:flex; gap:8px; align-items:center; padding:10px 12px;
+      border:1px solid var(--line); border-radius:14px; background:rgba(15,23,42,.55);
+      min-width:220px;
+    }
+    .ctrl label{font-size:12px; color:var(--muted); flex:0 0 auto}
+    select, input[type="text"], input[type="number"]{
+      width:100%; background:transparent; color:var(--text);
+      border:none; outline:none; font-size:13px;
+    }
+    .tabs{margin-top:14px; display:flex; gap:10px; flex-wrap:wrap;}
+    .tabbtn{
+      padding:10px 12px; border-radius:999px; border:1px solid var(--line);
+      background: rgba(18,24,38,.7); color:var(--text);
+      cursor:pointer; user-select:none; font-size:13px;
+    }
+    .tabbtn.active{border-color: rgba(212,175,55,.65); box-shadow: 0 0 0 3px rgba(212,175,55,.12)}
+    .grid{display:grid; grid-template-columns: 1.1fr .9fr; gap:14px; margin-top:14px;}
+    @media (max-width: 980px){ .grid{grid-template-columns:1fr} }
+    .card{
+      background: linear-gradient(180deg, rgba(18,24,38,.92), rgba(18,24,38,.72));
+      border:1px solid var(--line); border-radius:var(--radius);
+      box-shadow:var(--shadow); padding:16px; min-width:0;
+    }
+    .card h2{
+      margin:0 0 10px; font-size:14px; letter-spacing:.02em;
+      display:flex; align-items:center; justify-content:space-between; gap:10px; flex-wrap:wrap;
+    }
+    .sub{color:var(--muted); font-size:12px; margin:0 0 10px; white-space:normal}
+    .row{display:grid; grid-template-columns:1fr 1fr; gap:10px}
+    @media (max-width: 720px){ .row{grid-template-columns:1fr} }
+    .field{
+      border:1px solid var(--line); border-radius:14px; padding:10px 12px;
+      background:rgba(15,23,42,.55); min-width:0;
+    }
+    .field .lab{
+      display:flex; align-items:center; gap:8px; justify-content:space-between;
+      color:var(--muted); font-size:12px; margin-bottom:6px; white-space:normal;
+    }
+    .hint{
+      display:inline-grid; place-items:center;
+      width:18px; height:18px; border-radius:999px;
+      border:1px solid rgba(148,163,184,.45);
+      color:rgba(148,163,184,.95);
+      font-size:12px; cursor:help; flex:0 0 auto;
+    }
+    .metricGrid{
+      display:grid; grid-template-columns: repeat(4, minmax(0,1fr));
+      gap:10px; margin-top:10px;
+    }
+    @media (max-width: 980px){ .metricGrid{grid-template-columns: repeat(2, minmax(0,1fr));} }
+    .metric{
+      border:1px solid var(--line); border-radius:16px; padding:12px;
+      background: rgba(15,23,42,.45); min-width:0;
+    }
+    .metric .k{
+      color:var(--muted); font-size:12px; white-space:normal;
+      display:flex; align-items:flex-start; justify-content:space-between; gap:8px;
+    }
+    .metric .v{font-size:18px; font-weight:750; margin-top:4px; white-space:normal; overflow-wrap:anywhere;}
+    .badge{
+      font-size:11px; padding:4px 8px; border-radius:999px; border:1px solid var(--line);
+      background: rgba(18,24,38,.7); color:var(--muted); white-space:nowrap;
+    }
+    .badge.ok{border-color:rgba(34,197,94,.4); color:rgba(34,197,94,.95)}
+    .badge.bad{border-color:rgba(239,68,68,.45); color:rgba(239,68,68,.95)}
+    .badge.warn{border-color:rgba(245,158,11,.45); color:rgba(245,158,11,.95)}
+    .btns{display:flex; gap:10px; flex-wrap:wrap}
+    button{
+      border:none; cursor:pointer; padding:10px 12px; border-radius:14px;
+      background: rgba(212,175,55,.15);
+      border:1px solid rgba(212,175,55,.35);
+      color:var(--text); font-size:13px;
+    }
+    button:hover{filter:brightness(1.06)}
+    .muted{background: rgba(148,163,184,.10); border-color: rgba(148,163,184,.25)}
+    .note{
+      border:1px dashed rgba(148,163,184,.28);
+      padding:12px; border-radius:16px; color:var(--muted); font-size:12px;
+      white-space:normal;
+    }
+    .recs{display:grid; gap:10px; margin-top:10px;}
+    .rec{
+      border-radius:16px; padding:12px; border:1px solid var(--line);
+      background: rgba(15,23,42,.45);
+      display:flex; gap:10px; align-items:flex-start;
+      white-space:normal; overflow-wrap:anywhere;
+    }
+    .dot{width:10px; height:10px; border-radius:999px; margin-top:4px; flex:0 0 auto}
+    .dot.ok{background:var(--ok)}
+    .dot.bad{background:var(--bad)}
+    .dot.warn{background:var(--warn)}
+
+    /* Simple chart */
+    .chartWrap{height:360px; width:100%; border:1px solid var(--line); border-radius:16px; background: rgba(15,23,42,.35); padding:10px;}
+    canvas{width:100%; height:100%;}
+
+    .hide{display:none !important}
+    .footer{
+      margin-top:14px; color:var(--muted); font-size:12px;
+      display:flex; justify-content:space-between; gap:12px; flex-wrap:wrap;
+    }
+    .glossary{display:grid; gap:10px;}
+    .glossary .item{
+      border:1px solid var(--line); border-radius:16px; padding:12px;
+      background: rgba(15,23,42,.35);
+      white-space:normal; overflow-wrap:anywhere;
+    }
+    .small{font-size:12px; color:var(--muted)}
+    .mono{font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace}
+
+    /* Print to PDF (offline) */
+    @media print{
+      body{background:#fff; color:#000;}
+      .topbar,.tabs,.btns{display:none !important;}
+      .card{box-shadow:none; border:1px solid #ddd; background:#fff; color:#000;}
+      .sub,.small,.note{color:#333 !important;}
+      .metric{border:1px solid #ddd; background:#fff;}
+      .badge{border:1px solid #ddd; color:#333;}
+      .chartWrap{border:1px solid #ddd; background:#fff;}
+    }
+  </style>
+</head>
+
+<body>
+  <div class="wrap">
+    <div class="topbar">
+      <div class="brand">
+        <div class="logo"><span>🦢</span></div>
+        <div class="titles">
+          <h1 id="appTitle">BLACK SWAN — CFO OS (Offline)</h1>
+          <p id="appSub">Offline-first: calcoli locali, niente server, niente dipendenze esterne.</p>
+        </div>
+      </div>
+
+      <div class="controls">
+        <div class="ctrl">
+          <label id="labLang">Lingua</label>
+          <select id="langSel">
+            <option value="it" selected>Italiano</option>
+            <option value="en">English</option>
+          </select>
+        </div>
+        <div class="ctrl">
+          <label id="labCompany">Azienda</label>
+          <input id="company" type="text" value="Test" />
+        </div>
+        <div class="ctrl">
+          <label id="labCurrency">Valuta</label>
+          <select id="currency">
+            <option value="€" selected>€</option>
+            <option value="$">$</option>
+            <option value="£">£</option>
+          </select>
+        </div>
+      </div>
+    </div>
+
+    <div class="tabs" id="tabs">
+      <div class="tabbtn active" data-tab="summary" id="tab_summary">🏠 Summary</div>
+      <div class="tabbtn" data-tab="invest" id="tab_invest">📊 Investimenti</div>
+      <div class="tabbtn" data-tab="saas" id="tab_saas">🔄 SaaS</div>
+      <div class="tabbtn" data-tab="liq" id="tab_liq">💧 Liquidità</div>
+      <div class="tabbtn" data-tab="bep" id="tab_bep">🎯 Break-even</div>
+      <div class="tabbtn" data-tab="stress" id="tab_stress">🌪️ Stress Test</div>
+      <div class="tabbtn" data-tab="glossary" id="tab_glossary">📘 Glossario</div>
+      <div class="tabbtn" data-tab="compliance" id="tab_compliance">🛡️ Compliance</div>
+    </div>
+
+    <!-- SUMMARY -->
+    <section id="tab-summary" class="grid">
+      <div class="card">
+        <h2>
+          <span id="sumTitle">Executive Dashboard</span>
+          <span class="badge muted" id="runStamp">—</span>
+        </h2>
+        <p class="sub" id="sumSub">KPI e raccomandazioni. Tutto locale (client-side).</p>
+
+        <div class="metricGrid">
+          <div class="metric">
+            <div class="k"><span id="kNPV">NPV (VAN)</span><span class="hint" id="tNPV" title="">?</span></div>
+            <div class="v" id="mNPV">—</div>
+            <div class="small" id="dNPV">—</div>
+          </div>
+          <div class="metric">
+            <div class="k"><span id="kIRR">IRR (TIR)</span><span class="hint" id="tIRR" title="">?</span></div>
+            <div class="v" id="mIRR">—</div>
+            <div class="small" id="dIRR">—</div>
+          </div>
+          <div class="metric">
+            <div class="k"><span id="kPayback">Payback</span><span class="hint" id="tPayback" title="">?</span></div>
+            <div class="v" id="mPayback">—</div>
+            <div class="small" id="dPayback">—</div>
+          </div>
+          <div class="metric">
+            <div class="k"><span id="kPFN">PFN</span><span class="hint" id="tPFN" title="">?</span></div>
+            <div class="v" id="mPFN">—</div>
+            <div class="small" id="dPFN">—</div>
+          </div>
+
+          <div class="metric">
+            <div class="k"><span id="kLTV">LTV/CAC</span><span class="hint" id="tLTV" title="">?</span></div>
+            <div class="v" id="mLTV">—</div>
+            <div class="small" id="dLTV">—</div>
+          </div>
+          <div class="metric">
+            <div class="k"><span id="kCCC">CCC</span><span class="hint" id="tCCC" title="">?</span></div>
+            <div class="v" id="mCCC">—</div>
+            <div class="small" id="dCCC">—</div>
+          </div>
+          <div class="metric">
+            <div class="k"><span id="kBEP">BEP (Valore)</span><span class="hint" id="tBEP" title="">?</span></div>
+            <div class="v" id="mBEP">—</div>
+            <div class="small" id="dBEP">—</div>
+          </div>
+          <div class="metric">
+            <div class="k"><span id="kSafety">Margine sicurezza</span><span class="hint" id="tSafety" title="">?</span></div>
+            <div class="v" id="mSafety">—</div>
+            <div class="small" id="dSafety">—</div>
+          </div>
+        </div>
+
+        <div class="recs" id="recs"></div>
+
+        <div style="margin-top:12px" class="btns">
+          <button class="muted" id="btnPrintPDF">📕 PDF (Stampa)</button>
+          <button class="muted" id="btnCSV">📗 Export CSV</button>
+          <button class="muted" id="btnReset">↩ Reset</button>
+        </div>
+
+        <div style="margin-top:12px" class="note" id="noteLocal">✅ Offline-ready: nessun dato esce dal browser.</div>
+      </div>
+
+      <div class="card">
+        <h2><span id="chartTitle">📉 Flussi di cassa</span><span class="badge muted" id="chartBadge">Investimenti</span></h2>
+        <p class="sub" id="chartSub">FCF annuale e cumulato (da Investimenti). Nessuna libreria esterna.</p>
+        <div class="chartWrap"><canvas id="cfCanvas"></canvas></div>
+      </div>
+    </section>
+
+    <!-- INVEST -->
+    <section id="tab-invest" class="grid hide">
+      <div class="card">
+        <h2><span id="invTitle">Analisi Investimenti</span><span class="badge muted" id="invHint">NPV / IRR / Payback</span></h2>
+        <p class="sub" id="invSub">Driver operativi + ipotesi. Formule trasparenti.</p>
+
+        <div class="row">
+          <div class="field">
+            <div class="lab"><span id="labCapex">Capex</span><span class="hint" id="hCapex" title="">?</span></div>
+            <input id="inv_capex" type="number" value="500000" />
+          </div>
+          <div class="field">
+            <div class="lab"><span id="labYears">Orizzonte (anni)</span><span class="hint" id="hYears" title="">?</span></div>
+            <input id="inv_years" type="number" min="1" max="50" value="5" />
+          </div>
+          <div class="field">
+            <div class="lab"><span id="labWACC">WACC %</span><span class="hint" id="hWACC" title="">?</span></div>
+            <input id="inv_wacc" type="number" step="0.1" value="10.0" />
+          </div>
+          <div class="field">
+            <div class="lab"><span id="labTax">Tax rate %</span><span class="hint" id="hTax" title="">?</span></div>
+            <input id="inv_tax" type="number" step="0.1" value="28.0" />
+          </div>
+        </div>
+
+        <hr style="border:none;border-top:1px solid var(--line); margin:14px 0;">
+
+        <div class="row">
+          <div class="field">
+            <div class="lab"><span id="labRev1">Ricavi anno 1</span><span class="hint" id="hRev1" title="">?</span></div>
+            <input id="inv_rev1" type="number" value="300000" />
+          </div>
+          <div class="field">
+            <div class="lab"><span id="labGrowth">Crescita ricavi %</span><span class="hint" id="hGrowth" title="">?</span></div>
+            <input id="inv_growth" type="number" step="0.1" value="15.0" />
+          </div>
+          <div class="field">
+            <div class="lab"><span id="labCogs">COGS %</span><span class="hint" id="hCogs" title="">?</span></div>
+            <input id="inv_cogs" type="number" step="0.1" value="40.0" />
+          </div>
+          <div class="field">
+            <div class="lab"><span id="labOpex1">Opex anno 1</span><span class="hint" id="hOpex1" title="">?</span></div>
+            <input id="inv_opex1" type="number" value="50000" />
+          </div>
+          <div class="field">
+            <div class="lab"><span id="labOpexG">Crescita opex %</span><span class="hint" id="hOpexG" title="">?</span></div>
+            <input id="inv_opexg" type="number" step="0.1" value="3.0" />
+          </div>
+          <div class="field">
+            <div class="lab"><span id="labDA">Ammortamento</span><span class="hint" id="hDA" title="">?</span></div>
+            <input id="inv_da" type="text" value="Auto (lineare)" disabled />
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <h2><span id="invKpiTitle">KPI Investimento</span><span class="badge muted" id="invKpiBadge">Live</span></h2>
+        <div class="metricGrid" style="grid-template-columns: repeat(2, minmax(0,1fr));">
+          <div class="metric"><div class="k"><span id="invK_NPV">NPV</span></div><div class="v" id="invNPV">—</div><div class="small" id="invNPVd">—</div></div>
+          <div class="metric"><div class="k"><span id="invK_IRR">IRR</span></div><div class="v" id="invIRR">—</div><div class="small" id="invIRRd">—</div></div>
+          <div class="metric"><div class="k"><span id="invK_PB">Payback</span></div><div class="v" id="invPB">—</div><div class="small" id="invPBd">—</div></div>
+          <div class="metric"><div class="k"><span id="invK_EB1">EBITDA Y1</span></div><div class="v" id="invEB1">—</div><div class="small" id="invEB1d">—</div></div>
+        </div>
+
+        <div style="margin-top:12px">
+          <div class="small" id="invTableTitle">Dettaglio annuale</div>
+          <div id="invTable" class="note" style="margin-top:8px; overflow:auto"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- SAAS -->
+    <section id="tab-saas" class="grid hide">
+      <div class="card">
+        <h2><span id="saasTitle">Metriche SaaS</span><span class="badge muted">LTV/CAC</span></h2>
+        <p class="sub" id="saasSub">Modello semplificato per efficienza commerciale.</p>
+
+        <div class="row">
+          <div class="field">
+            <div class="lab"><span id="labARPU">ARPU mensile</span><span class="hint" id="hARPU" title="">?</span></div>
+            <input id="saas_arpu" type="number" value="500" />
+          </div>
+          <div class="field">
+            <div class="lab"><span id="labGM">Margine lordo</span><span class="hint" id="hGM" title="">?</span></div>
+            <input id="saas_gm" type="number" step="0.01" value="0.85" />
+          </div>
+          <div class="field">
+            <div class="lab"><span id="labChurn">Churn mensile %</span><span class="hint" id="hChurn" title="">?</span></div>
+            <input id="saas_churn" type="number" step="0.1" value="2.0" />
+          </div>
+          <div class="field">
+            <div class="lab"><span id="labCAC">CAC</span><span class="hint" id="hCAC" title="">?</span></div>
+            <input id="saas_cac" type="number" value="4000" />
+          </div>
+        </div>
+
+        <div style="margin-top:12px" class="note" id="saasNote">Regola pratica: LTV/CAC &gt; 3x è sano.</div>
+      </div>
+
+      <div class="card">
+        <h2><span id="saasKpi">KPI SaaS</span><span class="badge muted" id="saasLive">Live</span></h2>
+        <div class="metricGrid" style="grid-template-columns: repeat(2, minmax(0,1fr));">
+          <div class="metric"><div class="k"><span id="saasK_LTV">LTV</span></div><div class="v" id="mSaasLTV">—</div><div class="small" id="mSaasLTVd">—</div></div>
+          <div class="metric"><div class="k"><span id="saasK_Ratio">LTV/CAC</span></div><div class="v" id="mSaasRatio">—</div><div class="small" id="mSaasRatiod">—</div></div>
+        </div>
+        <div class="recs" id="saasRecs"></div>
+      </div>
+    </section>
+
+    <!-- LIQ -->
+    <section id="tab-liq" class="grid hide">
+      <div class="card">
+        <h2><span id="liqTitle">Liquidità & PFN</span><span class="badge muted">PFN / CCC</span></h2>
+        <p class="sub" id="liqSub">Indicatori per tensioni di cassa e ciclo operativo.</p>
+
+        <div class="row">
+          <div class="field"><div class="lab"><span id="labCash">Cassa</span></div><input id="liq_cash" type="number" value="150000" /></div>
+          <div class="field"><div class="lab"><span id="labDebt">Debiti finanziari</span></div><input id="liq_debt" type="number" value="400000" /></div>
+        </div>
+
+        <hr style="border:none;border-top:1px solid var(--line); margin:14px 0;">
+
+        <div class="row">
+          <div class="field"><div class="lab"><span id="labDSO">DSO</span></div><input id="liq_dso" type="number" value="60" /></div>
+          <div class="field"><div class="lab"><span id="labDIO">DIO</span></div><input id="liq_dio" type="number" value="45" /></div>
+          <div class="field"><div class="lab"><span id="labDPO">DPO</span></div><input id="liq_dpo" type="number" value="90" /></div>
+          <div class="field"><div class="lab"><span id="labCCC">CCC</span></div><input id="liq_ccc_ro" type="text" value="—" disabled /></div>
+        </div>
+      </div>
+
+      <div class="card">
+        <h2><span id="liqKpiTitle">KPI Liquidità</span><span class="badge muted">Live</span></h2>
+        <div class="metricGrid" style="grid-template-columns: repeat(2, minmax(0,1fr));">
+          <div class="metric"><div class="k"><span id="liqK_PFN">PFN</span></div><div class="v" id="mLiqPFN">—</div><div class="small" id="mLiqPFNd">—</div></div>
+          <div class="metric"><div class="k"><span id="liqK_CCC">CCC</span></div><div class="v" id="mLiqCCC">—</div><div class="small" id="mLiqCCCd">—</div></div>
+        </div>
+        <div class="recs" id="liqRecs"></div>
+      </div>
+    </section>
+
+    <!-- BEP -->
+    <section id="tab-bep" class="grid hide">
+      <div class="card">
+        <h2><span id="bepTitle">Break-even</span><span class="badge muted">BEP / Safety</span></h2>
+        <p class="sub" id="bepSub">Punto di pareggio e margine di sicurezza.</p>
+
+        <div class="row">
+          <div class="field"><div class="lab"><span id="labPrice">Prezzo unit.</span></div><input id="bep_price" type="number" value="100" /></div>
+          <div class="field"><div class="lab"><span id="labVC">Costo var. unit.</span></div><input id="bep_vc" type="number" value="60" /></div>
+          <div class="field"><div class="lab"><span id="labFC">Costi fissi</span></div><input id="bep_fc" type="number" value="150000" /></div>
+          <div class="field"><div class="lab"><span id="labVol">Volume (unità)</span></div><input id="bep_vol" type="number" value="5000" /></div>
+        </div>
+      </div>
+
+      <div class="card">
+        <h2><span id="bepKpiTitle">KPI Break-even</span><span class="badge muted">Live</span></h2>
+        <div class="metricGrid" style="grid-template-columns: repeat(2, minmax(0,1fr));">
+          <div class="metric"><div class="k"><span id="bepK_Units">BEP (unità)</span></div><div class="v" id="mBepUnits">—</div><div class="small" id="mBepUnitsd">—</div></div>
+          <div class="metric"><div class="k"><span id="bepK_Value">BEP (valore)</span></div><div class="v" id="mBepValue">—</div><div class="small" id="mBepValued">—</div></div>
+          <div class="metric"><div class="k"><span id="bepK_Safety">Safety</span></div><div class="v" id="mBepSafety">—</div><div class="small" id="mBepSafetyd">—</div></div>
+          <div class="metric"><div class="k"><span id="bepK_MC">MC unit.</span></div><div class="v" id="mBepMC">—</div><div class="small" id="mBepMCd">—</div></div>
+        </div>
+        <div class="recs" id="bepRecs"></div>
+      </div>
+    </section>
+
+    <!-- STRESS -->
+    <section id="tab-stress" class="grid hide">
+      <div class="card">
+        <h2><span id="stressTitle">Stress Test</span><span class="badge warn">Shock</span></h2>
+        <p class="sub" id="stressSub">Shock su ricavi/costi e verifica EBITDA Y1.</p>
+
+        <div class="row">
+          <div class="field"><div class="lab"><span id="labShockRev">Shock ricavi %</span></div><input id="st_rev" type="number" step="1" value="-20" /></div>
+          <div class="field"><div class="lab"><span id="labShockCost">Shock costi %</span></div><input id="st_cost" type="number" step="1" value="0" /></div>
+        </div>
+
+        <div style="margin-top:12px" class="note" id="stressNote">Lo stress usa i parametri di “Investimenti” (Y1).</div>
+      </div>
+
+      <div class="card">
+        <h2><span id="stressKpiTitle">Risultato stress</span><span class="badge muted">EBITDA</span></h2>
+        <div class="metricGrid" style="grid-template-columns: repeat(2, minmax(0,1fr));">
+          <div class="metric"><div class="k"><span id="stK_Base">EBITDA Base</span></div><div class="v" id="mStBase">—</div><div class="small" id="mStBased">—</div></div>
+          <div class="metric"><div class="k"><span id="stK_Stress">EBITDA Stress</span></div><div class="v" id="mStStress">—</div><div class="small" id="mStStressd">—</div></div>
+        </div>
+        <div class="recs" id="stressRecs"></div>
+      </div>
+    </section>
+
+    <!-- GLOSSARY -->
+    <section id="tab-glossary" class="grid hide">
+      <div class="card">
+        <h2><span id="glTitle">Glossario & Formule</span><span class="badge muted" id="glBadge">Trasparenza</span></h2>
+        <p class="sub" id="glSub">Definizioni operative (senza riferimenti esterni).</p>
+        <div class="glossary" id="glossaryList"></div>
+      </div>
+
+      <div class="card">
+        <h2><span id="glWaccTitle">WACC (formula)</span><span class="badge muted mono" id="glWaccFormula">E/V × Re + D/V × Rd × (1 − Tc)</span></h2>
+        <p class="sub" id="glWaccSub">In questa versione il WACC è un input (hurdle rate).</p>
+        <div class="note">
+          <div><b id="glLegend">Legenda</b></div>
+          <div class="small" id="glLegendBody">E=Equity, D=Debt, V=E+D, Re=costo equity, Rd=costo debito, Tc=tax rate.</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- COMPLIANCE -->
+    <section id="tab-compliance" class="grid hide">
+      <div class="card">
+        <h2><span id="cmpTitle">Compliance & Sicurezza</span><span class="badge ok" id="cmpBadge">Client-side</span></h2>
+        <p class="sub" id="cmpSub">Vincoli per uso aziendale senza “sorprese”.</p>
+
+        <div class="note" style="display:grid;gap:10px" id="cmpList"></div>
+      </div>
+
+      <div class="card">
+        <h2><span id="intTitle">Integrazione aziendale</span><span class="badge muted" id="intBadge">Placeholder</span></h2>
+        <p class="sub" id="intSub">Template: import/export CSV e API interne (non attive).</p>
+
+        <div class="note">
+          <div><b id="intPattern">Pattern consigliato</b></div>
+          <div class="small" id="intPatternBody">Export/Import CSV + endpoint REST interno (gateway aziendale), log e policy GDPR.</div>
+        </div>
+
+        <div class="note" style="margin-top:12px">
+          <div class="small"><b id="intExample">Esempio payload (non eseguito)</b></div>
+          <div class="mono small" style="overflow:auto" id="intPayload">
+            POST /internal/cfoos/input<br/>
+            { "rev1": 300000, "cogs_pct": 0.40, "opex1": 50000, "cash": 150000, "debt": 400000 }
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <div class="footer">
+      <div id="footLeft">Black Swan CFO OS — Offline • v1.0</div>
+      <div id="footRight">Uso interno • Nessuna consulenza legale automatica</div>
+    </div>
+  </div>
+
+<script>
+/* -------------------------
+   Full i18n (practical coverage)
+-------------------------- */
+const I18N = {
+  it: {
+    appTitle: "BLACK SWAN — CFO OS (Offline)",
+    appSub: "Offline-first: calcoli locali, niente server, niente dipendenze esterne.",
+    labLang:"Lingua", labCompany:"Azienda", labCurrency:"Valuta",
+    tabs: {summary:"🏠 Summary", invest:"📊 Investimenti", saas:"🔄 SaaS", liq:"💧 Liquidità", bep:"🎯 Break-even", stress:"🌪️ Stress Test", glossary:"📘 Glossario", compliance:"🛡️ Compliance"},
+    sumTitle:"Executive Dashboard",
+    sumSub:"KPI e raccomandazioni. Tutto locale (client-side).",
+    chartTitle:"📉 Flussi di cassa",
+    chartSub:"FCF annuale e cumulato (da Investimenti). Nessuna libreria esterna.",
+    invTitle:"Analisi Investimenti",
+    invSub:"Driver operativi + ipotesi. Formule trasparenti.",
+    invTableTitle:"Dettaglio annuale",
+    saasTitle:"Metriche SaaS",
+    saasSub:"Modello semplificato per efficienza commerciale.",
+    saasNote:"Regola pratica: LTV/CAC > 3x è sano.",
+    liqTitle:"Liquidità & PFN",
+    liqSub:"Indicatori per tensioni di cassa e ciclo operativo.",
+    bepTitle:"Break-even",
+    bepSub:"Punto di pareggio e margine di sicurezza.",
+    stressTitle:"Stress Test",
+    stressSub:"Shock su ricavi/costi e verifica EBITDA Y1.",
+    stressNote:"Lo stress usa i parametri di “Investimenti” (Y1).",
+    glTitle:"Glossario & Formule",
+    glSub:"Definizioni operative (senza riferimenti esterni).",
+    glWaccSub:"In questa versione il WACC è un input (hurdle rate).",
+    glLegend:"Legenda",
+    glLegendBody:"E=Equity, D=Debt, V=E+D, Re=costo equity, Rd=costo debito, Tc=tax rate.",
+    cmpTitle:"Compliance & Sicurezza",
+    cmpSub:"Vincoli per uso aziendale senza “sorprese”.",
+    cmpList:[
+      "✅ Nessun invio dati: calcoli nel browser, nessuna API automatica.",
+      "✅ Nessun training: non vengono usati modelli o raccolta dati.",
+      "✅ Copyright-safe: definizioni e formule sono concetti generali.",
+      "✅ Auditabile: logica e formule esposte nel codice."
+    ],
+    intTitle:"Integrazione aziendale",
+    intSub:"Template: import/export CSV e API interne (non attive).",
+    intPattern:"Pattern consigliato",
+    intPatternBody:"Export/Import CSV + endpoint REST interno (gateway aziendale), log e policy GDPR.",
+    intExample:"Esempio payload (non eseguito)",
+    footRight:"Uso interno • Nessuna consulenza legale automatica",
+
+    // Labels
+    kNPV:"NPV (VAN)", kIRR:"IRR (TIR)", kPayback:"Payback", kPFN:"PFN", kLTV:"LTV/CAC", kCCC:"CCC", kBEP:"BEP (Valore)", kSafety:"Margine sicurezza",
+    capex:"Capex", years:"Orizzonte (anni)", wacc:"WACC %", tax:"Tax rate %", rev1:"Ricavi anno 1", growth:"Crescita ricavi %", cogs:"COGS %", opex1:"Opex anno 1", opexg:"Crescita opex %",
+    arpu:"ARPU mensile", gm:"Margine lordo", churn:"Churn mensile %", cac:"CAC",
+    cash:"Cassa", debt:"Debiti finanziari", dso:"DSO", dio:"DIO", dpo:"DPO",
+    price:"Prezzo unit.", vc:"Costo var. unit.", fc:"Costi fissi", vol:"Volume (unità)",
+    shockRev:"Shock ricavi %", shockCost:"Shock costi %",
+
+    // Tooltips (glossary-clean)
+    tNPV:"Somma dei flussi di cassa attualizzati al tasso di sconto.",
+    tIRR:"Tasso interno di rendimento che annulla il NPV (NPV=0).",
+    tPayback:"Periodo necessario a recuperare l’investimento iniziale.",
+    tPFN:"Debiti finanziari totali − disponibilità liquide.",
+    tLTV:"LTV=(ARPU×Margine lordo)/churn; LTV/CAC=LTV/CAC. Target tipico: >3x.",
+    tCCC:"Cash Conversion Cycle = DIO + DSO − DPO.",
+    tBEP:"Break-even: costi fissi ÷ (prezzo − costo variabile), espresso anche in valore (fatturato).",
+    tSafety:"(Vendite effettive − vendite BEP) / vendite effettive.",
+
+    // Recommendation strings
+    recNPV_OK:"✅ Semaforo Verde: il progetto crea valore economico.",
+    recNPV_KO:"❌ Semaforo Rosso: il progetto non copre il costo del capitale.",
+    recCCC_OK:"💧 Liquidità: ciclo cassa sotto controllo.",
+    recCCC_KO:"⚠️ Liquidità: ciclo cassa lungo → rischio tensione.",
+    recSaaS_OK:"🚀 SaaS: LTV/CAC sano (efficienza commerciale).",
+    recSaaS_KO:"🔻 SaaS: LTV/CAC debole → agire su churn/pricing/canali.",
+    recStress_OK:"🛡️ Stress test: EBITDA positivo anche in shock.",
+    recStress_KO:"🌪️ Stress test: EBITDA negativo in shock → mitigazioni urgenti.",
+
+    // CSV/PDF buttons
+    btnPrint:"📕 PDF (Stampa)",
+    btnCSV:"📗 Export CSV",
+    btnReset:"↩ Reset",
+    noteLocal:"✅ Offline-ready: nessun dato esce dal browser."
+  },
+
+  en: {
+    appTitle: "BLACK SWAN — CFO OS (Offline)",
+    appSub: "Offline-first: local calculations, no servers, no external dependencies.",
+    labLang:"Language", labCompany:"Company", labCurrency:"Currency",
+    tabs: {summary:"🏠 Summary", invest:"📊 Investments", saas:"🔄 SaaS", liq:"💧 Liquidity", bep:"🎯 Break-even", stress:"🌪️ Stress Test", glossary:"📘 Glossary", compliance:"🛡️ Compliance"},
+    sumTitle:"Executive Dashboard",
+    sumSub:"KPIs and recommendations. Everything runs locally (client-side).",
+    chartTitle:"📉 Cash flows",
+    chartSub:"Annual FCF and cumulative (from Investments). No external libraries.",
+    invTitle:"Investment Analysis",
+    invSub:"Operational drivers + assumptions. Transparent formulas.",
+    invTableTitle:"Annual detail",
+    saasTitle:"SaaS Metrics",
+    saasSub:"Simplified model for go-to-market efficiency.",
+    saasNote:"Rule of thumb: LTV/CAC > 3x is healthy.",
+    liqTitle:"Liquidity & Net Debt",
+    liqSub:"Indicators for cash tension and operating cycle.",
+    bepTitle:"Break-even",
+    bepSub:"Break-even point and safety margin.",
+    stressTitle:"Stress Test",
+    stressSub:"Revenue/cost shocks and EBITDA Y1 resilience check.",
+    stressNote:"Stress uses “Investments” parameters (Y1).",
+    glTitle:"Glossary & Formulas",
+    glSub:"Operational definitions (no external references).",
+    glWaccSub:"In this version WACC is an input (hurdle rate).",
+    glLegend:"Legend",
+    glLegendBody:"E=Equity, D=Debt, V=E+D, Re=cost of equity, Rd=cost of debt, Tc=tax rate.",
+    cmpTitle:"Compliance & Security",
+    cmpSub:"Constraints for safe internal corporate usage.",
+    cmpList:[
+      "✅ No data sent out: browser-only calculations, no automatic API calls.",
+      "✅ No training: no models, no data collection.",
+      "✅ Copyright-safe: formulas/definitions are general concepts.",
+      "✅ Auditable: logic and formulas are readable in code."
+    ],
+    intTitle:"Enterprise Integration",
+    intSub:"Template: CSV import/export and internal APIs (disabled).",
+    intPattern:"Recommended pattern",
+    intPatternBody:"CSV Export/Import + internal REST endpoint (company gateway), logs and GDPR policy.",
+    intExample:"Example payload (not executed)",
+    footRight:"Internal use • Not automated legal advice",
+
+    kNPV:"NPV", kIRR:"IRR", kPayback:"Payback Period", kPFN:"Net Financial Position", kLTV:"LTV/CAC", kCCC:"CCC", kBEP:"BEP (Value)", kSafety:"Safety Margin",
+    capex:"Capex", years:"Horizon (years)", wacc:"WACC %", tax:"Tax rate %", rev1:"Revenue Year 1", growth:"Revenue Growth %", cogs:"COGS %", opex1:"Opex Year 1", opexg:"Opex Growth %",
+    arpu:"Monthly ARPU", gm:"Gross margin", churn:"Monthly churn %", cac:"CAC",
+    cash:"Cash", debt:"Financial debt", dso:"DSO", dio:"DIO", dpo:"DPO",
+    price:"Unit price", vc:"Unit variable cost", fc:"Fixed costs", vol:"Volume (units)",
+    shockRev:"Revenue shock %", shockCost:"Cost shock %",
+
+    tNPV:"Sum of discounted cash flows at the discount rate.",
+    tIRR:"Internal rate that makes NPV equal to zero.",
+    tPayback:"Time needed to recover the initial investment.",
+    tPFN:"Total financial debt minus cash and cash equivalents.",
+    tLTV:"LTV=(ARPU×Gross margin)/churn; LTV/CAC=LTV/CAC. Typical target: >3x.",
+    tCCC:"Cash Conversion Cycle = DIO + DSO − DPO.",
+    tBEP:"Break-even: fixed costs ÷ (price − variable cost), also expressed in revenue value.",
+    tSafety:"(Actual sales − BEP sales) / actual sales.",
+
+    recNPV_OK:"✅ Green Light: the project creates economic value.",
+    recNPV_KO:"❌ Red Light: the project does not cover cost of capital.",
+    recCCC_OK:"💧 Liquidity: cash cycle under control.",
+    recCCC_KO:"⚠️ Liquidity: long cash cycle → funding risk.",
+    recSaaS_OK:"🚀 SaaS: healthy LTV/CAC (go-to-market efficiency).",
+    recSaaS_KO:"🔻 SaaS: weak LTV/CAC → work on churn/pricing/channels.",
+    recStress_OK:"🛡️ Stress test: EBITDA stays positive under shock.",
+    recStress_KO:"🌪️ Stress test: EBITDA turns negative → urgent mitigations.",
+
+    btnPrint:"📕 PDF (Print)",
+    btnCSV:"📗 Export CSV",
+    btnReset:"↩ Reset",
+    noteLocal:"✅ Offline-ready: no data leaves your browser."
+  }
+};
+
+/* -------------------------
+   Helpers
+-------------------------- */
+const $ = (id) => document.getElementById(id);
+const clamp = (v,a,b) => Math.max(a, Math.min(b, v));
+const nowStamp = () => new Date().toISOString().slice(0,19).replace("T"," ");
+const fmtMoney = (x, cur) => {
+  if (!isFinite(x)) return "—";
+  const sign = x < 0 ? "-" : "";
+  const v = Math.abs(x);
+  return `${sign}${cur} ${v.toLocaleString(undefined,{maximumFractionDigits:0})}`;
+};
+const fmtPct = (x) => isFinite(x) ? (x*100).toFixed(1) + "%" : "—";
+
+/* -------------------------
+   Finance (transparent)
+-------------------------- */
+function npv(rate, cfs){
+  let s = 0;
+  for(let t=0;t<cfs.length;t++){
+    s += cfs[t] / Math.pow(1+rate, t);
+  }
+  return s;
+}
+function irr(cfs, guess=0.1){
+  let r = guess;
+  for(let i=0;i<120;i++){
+    let f=0, df=0;
+    for(let t=0;t<cfs.length;t++){
+      const denom = Math.pow(1+r, t);
+      f += cfs[t]/denom;
+      if(t>0) df += -t*cfs[t]/(denom*(1+r));
+    }
+    if(Math.abs(f) < 1e-7) return r;
+    if(df === 0 || !isFinite(df)) break;
+    const step = f/df;
+    r = r - step;
+    if(r < -0.95) r = -0.95;
+    if(r > 5) r = 5;
+    if(Math.abs(step) < 1e-8) return r;
+  }
+  return NaN;
+}
+function paybackYear(cfs){
+  let cum = 0;
+  for(let t=0;t<cfs.length;t++){
+    cum += cfs[t];
+    if(cum >= 0) return t;
+  }
+  return null;
+}
+
+/* -------------------------
+   Glossary (language-aware)
+-------------------------- */
+function getGlossary(lang){
+  if(lang==="en"){
+    return [
+      {k:"NPV", v:"Sum of discounted cash flows at the discount rate."},
+      {k:"IRR", v:"Internal rate of return that makes NPV equal to zero."},
+      {k:"Payback Period", v:"Time required to recover the initial investment."},
+      {k:"WACC", v:"WACC = E/V × Re + D/V × Rd × (1 − Tc)."},
+      {k:"LTV/CAC", v:"LTV = (ARPU × Gross margin) / churn; LTV/CAC = LTV / CAC."},
+      {k:"ARPU", v:"Total revenue / active users."},
+      {k:"Churn Rate", v:"Customers lost / starting customers."},
+      {k:"Net Financial Position (PFN)", v:"Total financial debt − cash and cash equivalents."},
+      {k:"CCC", v:"Cash Conversion Cycle = DIO + DSO − DPO."},
+      {k:"BEP", v:"Fixed costs ÷ (unit price − unit variable cost)."},
+      {k:"Safety Margin", v:"(Actual sales − BEP sales) / actual sales."}
+    ];
+  }
+  return [
+    {k:"NPV (Net Present Value / VAN)", v:"Somma dei flussi di cassa attualizzati al tasso di sconto."},
+    {k:"IRR (Internal Rate of Return / TIR)", v:"Tasso interno di rendimento che annulla il NPV (NPV=0)."},
+    {k:"Payback Period", v:"Periodo necessario a recuperare l’investimento iniziale."},
+    {k:"WACC", v:"WACC = E/V × Re + D/V × Rd × (1 − Tc)."},
+    {k:"LTV/CAC", v:"LTV = (ARPU × Margine lordo) / churn; LTV/CAC = LTV / CAC."},
+    {k:"ARPU", v:"Ricavi totali / numero di utenti attivi."},
+    {k:"Churn Rate", v:"Clienti persi / clienti iniziali."},
+    {k:"PFN", v:"Debiti finanziari totali − disponibilità liquide."},
+    {k:"CCC", v:"Cash Conversion Cycle = DIO + DSO − DPO."},
+    {k:"BEP", v:"Costi fissi ÷ (Prezzo unitario − Costo variabile unitario)."},
+    {k:"Margine di sicurezza", v:"(Vendite effettive − vendite BEP) / vendite effettive."}
+  ];
+}
+
+/* -------------------------
+   Input / Compute
+-------------------------- */
+function getInputs(){
+  return {
+    lang: $("langSel").value,
+    cur: $("currency").value,
+
+    capex: +$("inv_capex").value || 0,
+    years: clamp(+$("inv_years").value || 1, 1, 50),
+    wacc: (+$("inv_wacc").value || 0)/100,
+    tax: (+$("inv_tax").value || 0)/100,
+    rev1: +$("inv_rev1").value || 0,
+    growth: (+$("inv_growth").value || 0)/100,
+    cogs: (+$("inv_cogs").value || 0)/100,
+    opex1: +$("inv_opex1").value || 0,
+    opexg: (+$("inv_opexg").value || 0)/100,
+
+    arpu: +$("saas_arpu").value || 0,
+    gm: +$("saas_gm").value || 0,
+    churn: (+$("saas_churn").value || 0)/100,
+    cac: +$("saas_cac").value || 0,
+
+    cash: +$("liq_cash").value || 0,
+    debt: +$("liq_debt").value || 0,
+    dso: +$("liq_dso").value || 0,
+    dio: +$("liq_dio").value || 0,
+    dpo: +$("liq_dpo").value || 0,
+
+    price: +$("bep_price").value || 0,
+    vc: +$("bep_vc").value || 0,
+    fc: +$("bep_fc").value || 0,
+    vol: +$("bep_vol").value || 0,
+
+    shockRev: (+$("st_rev").value || 0)/100,
+    shockCost: (+$("st_cost").value || 0)/100
+  };
+}
+
+function compute(){
+  const s = getInputs();
+  const da = s.capex / s.years; // linear amortization (simplified)
+  const cfs = [-s.capex];
+  const rows = [];
+
+  for(let i=1;i<=s.years;i++){
+    const r = s.rev1 * Math.pow(1+s.growth, i-1);
+    const c = r * s.cogs;
+    const o = s.opex1 * Math.pow(1+s.opexg, i-1);
+    const ebitda = r - c - o;
+    const ebit = ebitda - da;
+    const taxVal = Math.max(0, ebit * s.tax);
+    const nopat = ebit - taxVal;
+    const fcf = nopat + da;
+
+    cfs.push(fcf);
+    rows.push({year:i, revenue:r, ebitda, nopat, fcf});
+  }
+
+  const NPV = npv(s.wacc, cfs);
+  const IRR = irr(cfs, 0.1);
+  const pb = paybackYear(cfs);
+
+  let cum = [];
+  let cc = 0;
+  for(const x of cfs){ cc += x; cum.push(cc); }
+
+  const LTV = (s.churn>0) ? (s.arpu * s.gm) / s.churn : NaN;
+  const ratio = (s.cac>0) ? LTV / s.cac : NaN;
+
+  const PFN = s.debt - s.cash;
+  const CCC = s.dio + s.dso - s.dpo;
+
+  const mc = s.price - s.vc;
+  const bepUnits = (mc>0) ? (s.fc / mc) : NaN;
+  const bepValue = isFinite(bepUnits) ? (bepUnits * s.price) : NaN;
+  const salesActual = s.vol * s.price;
+  const safety = (salesActual>0 && isFinite(bepValue)) ? (salesActual - bepValue)/salesActual : NaN;
+
+  const baseEB = s.rev1*(1 - s.cogs) - s.opex1;
+  const stressedRev = s.rev1*(1+s.shockRev);
+  const stressedCogsPct = s.cogs*(1+s.shockCost);
+  const stressEB = stressedRev*(1 - stressedCogsPct) - s.opex1;
+
+  return {s, cfs, rows, NPV, IRR, pb, cum, LTV, ratio, PFN, CCC, mc, bepUnits, bepValue, safety, baseEB, stressEB};
+}
+
+/* -------------------------
+   Simple Canvas chart (FCF bars + cumulative line)
+-------------------------- */
+function drawChart(r){
+  const canvas = $("cfCanvas");
+  const ctx = canvas.getContext("2d");
+
+  // resize to actual pixels for sharpness
+  const rect = canvas.getBoundingClientRect();
+  canvas.width = Math.floor(rect.width * devicePixelRatio);
+  canvas.height = Math.floor(rect.height * devicePixelRatio);
+  ctx.scale(devicePixelRatio, devicePixelRatio);
+
+  const w = rect.width, h = rect.height;
+  ctx.clearRect(0,0,w,h);
+
+  // padding
+  const padL = 46, padR = 16, padT = 18, padB = 36;
+  const innerW = w - padL - padR;
+  const innerH = h - padT - padB;
+
+  // data
+  const bars = r.cfs.slice(1);
+  const line = r.cum.slice(1);
+  const n = Math.max(1, bars.length);
+
+  const all = bars.concat(line);
+  let minV = Math.min(...all, 0);
+  let maxV = Math.max(...all, 0);
+  if(minV === maxV){ maxV = minV + 1; }
+
+  const yToPx = (v) => padT + (maxV - v) * (innerH / (maxV - minV));
+  const xStep = innerW / n;
+
+  // grid + axes
+  ctx.strokeStyle = "rgba(148,163,184,0.25)";
+  ctx.lineWidth = 1;
+  ctx.beginPath();
+  // baseline zero
+  const y0 = yToPx(0);
+  ctx.moveTo(padL, y0);
+  ctx.lineTo(padL + innerW, y0);
+  ctx.stroke();
+
+  // left axis label (min/max)
+  ctx.fillStyle = "rgba(148,163,184,0.9)";
+  ctx.font = "12px system-ui";
+  ctx.fillText(maxV.toFixed(0), 6, padT+10);
+  ctx.fillText(minV.toFixed(0), 6, padT+innerH);
+
+  // bars
+  for(let i=0;i<n;i++){
+    const x = padL + i*xStep + xStep*0.18;
+    const bw = xStep*0.64;
+    const v = bars[i] ?? 0;
+    const y = yToPx(Math.max(v,0));
+    const yv = yToPx(v);
+    const top = Math.min(y, yv);
+    const bh = Math.abs(y - yv);
+
+    ctx.fillStyle = "rgba(59,130,246,0.85)";
+    ctx.fillRect(x, top, bw, bh);
+
+    // x labels
+    ctx.fillStyle = "rgba(148,163,184,0.9)";
+    ctx.font = "11px system-ui";
+    ctx.fillText("Y"+(i+1), x + bw/2 - 10, padT + innerH + 22);
+  }
+
+  // cumulative line
+  ctx.strokeStyle = "rgba(239,68,68,0.95)";
+  ctx.lineWidth = 2.5;
+  ctx.beginPath();
+  for(let i=0;i<n;i++){
+    const x = padL + i*xStep + xStep/2;
+    const y = yToPx(line[i] ?? 0);
+    if(i===0) ctx.moveTo(x,y);
+    else ctx.lineTo(x,y);
+  }
+  ctx.stroke();
+
+  // markers
+  ctx.fillStyle = "rgba(239,68,68,1)";
+  for(let i=0;i<n;i++){
+    const x = padL + i*xStep + xStep/2;
+    const y = yToPx(line[i] ?? 0);
+    ctx.beginPath(); ctx.arc(x,y,3.2,0,Math.PI*2); ctx.fill();
+  }
+}
+
+/* -------------------------
+   Render UI
+-------------------------- */
+function setText(id, val){ if($(id)) $(id).textContent = val; }
+function setTitle(id, val){ if($(id)) $(id).title = val; }
+
+function renderGlossary(lang){
+  const list = $("glossaryList");
+  list.innerHTML = "";
+  for(const it of getGlossary(lang)){
+    const div = document.createElement("div");
+    div.className = "item";
+    div.innerHTML = `<div style="font-weight:750">${it.k}</div><div class="small" style="margin-top:4px">${it.v}</div>`;
+    list.appendChild(div);
+  }
+}
+
+function applyLang(){
+  const lang = $("langSel").value;
+  const L = I18N[lang];
+
+  // Header
+  setText("appTitle", L.appTitle);
+  setText("appSub", L.appSub);
+  setText("labLang", L.labLang);
+  setText("labCompany", L.labCompany);
+  setText("labCurrency", L.labCurrency);
+
+  // Tabs
+  setText("tab_summary", L.tabs.summary);
+  setText("tab_invest", L.tabs.invest);
+  setText("tab_saas", L.tabs.saas);
+  setText("tab_liq", L.tabs.liq);
+  setText("tab_bep", L.tabs.bep);
+  setText("tab_stress", L.tabs.stress);
+  setText("tab_glossary", L.tabs.glossary);
+  setText("tab_compliance", L.tabs.compliance);
+
+  // Summary
+  setText("sumTitle", L.sumTitle);
+  setText("sumSub", L.sumSub);
+  setText("chartTitle", L.chartTitle);
+  setText("chartSub", L.chartSub);
+
+  // Labels (summary)
+  setText("kNPV", L.kNPV);
+  setText("kIRR", L.kIRR);
+  setText("kPayback", L.kPayback);
+  setText("kPFN", L.kPFN);
+  setText("kLTV", L.kLTV);
+  setText("kCCC", L.kCCC);
+  setText("kBEP", L.kBEP);
+  setText("kSafety", L.kSafety);
+
+  // Tooltips
+  setTitle("tNPV", L.tNPV);
+  setTitle("tIRR", L.tIRR);
+  setTitle("tPayback", L.tPayback);
+  setTitle("tPFN", L.tPFN);
+  setTitle("tLTV", L.tLTV);
+  setTitle("tCCC", L.tCCC);
+  setTitle("tBEP", L.tBEP);
+  setTitle("tSafety", L.tSafety);
+
+  // Invest labels
+  setText("invTitle", L.invTitle);
+  setText("invSub", L.invSub);
+  setText("invTableTitle", L.invTableTitle);
+
+  setText("labCapex", L.capex);
+  setText("labYears", L.years);
+  setText("labWACC", L.wacc);
+  setText("labTax", L.tax);
+  setText("labRev1", L.rev1);
+  setText("labGrowth", L.growth);
+  setText("labCogs", L.cogs);
+  setText("labOpex1", L.opex1);
+  setText("labOpexG", L.opexg);
+
+  // SaaS
+  setText("saasTitle", L.saasTitle);
+  setText("saasSub", L.saasSub);
+  setText("saasNote", L.saasNote);
+  setText("labARPU", L.arpu);
+  setText("labGM", L.gm);
+  setText("labChurn", L.churn);
+  setText("labCAC", L.cac);
+
+  // Liquidity
+  setText("liqTitle", L.liqTitle);
+  setText("liqSub", L.liqSub);
+  setText("labCash", L.cash);
+  setText("labDebt", L.debt);
+  setText("labDSO", L.dso);
+  setText("labDIO", L.dio);
+  setText("labDPO", L.dpo);
+
+  // BEP
+  setText("bepTitle", L.bepTitle);
+  setText("bepSub", L.bepSub);
+  setText("labPrice", L.price);
+  setText("labVC", L.vc);
+  setText("labFC", L.fc);
+  setText("labVol", L.vol);
+
+  // Stress
+  setText("stressTitle", L.stressTitle);
+  setText("stressSub", L.stressSub);
+  setText("stressNote", L.stressNote);
+  setText("labShockRev", L.shockRev);
+  setText("labShockCost", L.shockCost);
+
+  // Glossary
+  setText("glTitle", L.glTitle);
+  setText("glSub", L.glSub);
+  setText("glWaccSub", L.glWaccSub);
+  setText("glLegend", L.glLegend);
+  setText("glLegendBody", L.glLegendBody);
+
+  // Compliance
+  setText("cmpTitle", L.cmpTitle);
+  setText("cmpSub", L.cmpSub);
+  const cmpBox = $("cmpList");
+  cmpBox.innerHTML = "";
+  L.cmpList.forEach(x=>{
+    const div = document.createElement("div");
+    div.textContent = x;
+    cmpBox.appendChild(div);
+  });
+  setText("intTitle", L.intTitle);
+  setText("intSub", L.intSub);
+  setText("intPattern", L.intPattern);
+  setText("intPatternBody", L.intPatternBody);
+  setText("intExample", L.intExample);
+
+  // Buttons + note
+  setText("btnPrintPDF", L.btnPrint);
+  setText("btnCSV", L.btnCSV);
+  setText("btnReset", L.btnReset);
+  setText("noteLocal", L.noteLocal);
+  setText("footRight", L.footRight);
+
+  // Render glossary list
+  renderGlossary(lang);
+}
+
+function render(){
+  const r = compute();
+  const lang = r.s.lang;
+  const L = I18N[lang];
+  const cur = r.s.cur;
+
+  setText("runStamp", nowStamp());
+
+  // Summary metrics
+  setText("mNPV", fmtMoney(r.NPV, cur));
+  setText("mIRR", isFinite(r.IRR) ? fmtPct(r.IRR) : "N/A");
+  setText("mPayback", r.pb===null ? (lang==="en" ? "N/A" : "N.D.") : (r.pb===0 ? "0" : `${r.pb} ${lang==="en"?"years":"anni"}`));
+  setText("mPFN", fmtMoney(r.PFN, cur));
+  setText("mLTV", isFinite(r.ratio) ? `${r.ratio.toFixed(1)}x` : "—");
+  setText("mCCC", isFinite(r.CCC) ? `${r.CCC.toFixed(0)} ${lang==="en"?"days":"gg"}` : "—");
+  setText("mBEP", fmtMoney(r.bepValue, cur));
+  setText("mSafety", isFinite(r.safety) ? fmtPct(r.safety) : "—");
+
+  setText("dNPV", isFinite(r.NPV) ? (r.NPV>0 ? "OK" : "KO") : "—");
+  setText("dIRR", isFinite(r.IRR) ? `WACC ${(r.s.wacc*100).toFixed(1)}%` : "—");
+  setText("dPayback", r.pb===null ? (lang==="en"?"Not recovered in horizon":"Non recupera nell’orizzonte") : (lang==="en"?"Investment recovered":"Recupero investimento"));
+  setText("dPFN", r.PFN>0 ? (lang==="en"?"Net debt":"Debito netto") : (lang==="en"?"Net cash":"Cassa netta"));
+  setText("dLTV", isFinite(r.ratio) ? (r.ratio>3 ? (lang==="en"?"Healthy":"Sano") : (r.ratio<1 ? (lang==="en"?"Critical":"Critico") : (lang==="en"?"Needs improvement":"Da migliorare"))) : "—");
+  setText("dCCC", isFinite(r.CCC) ? (r.CCC<45 ? "Good" : (r.CCC<60 ? (lang==="en"?"Watch":"Attenzione") : "High")) : "—");
+  setText("dBEP", isFinite(r.bepUnits) ? `${r.bepUnits.toFixed(0)} ${lang==="en"?"units":"unità"}` : "—");
+  setText("dSafety", isFinite(r.safety) ? (r.safety>0.2 ? (lang==="en"?"Buffer >20%":"Cuscinetto >20%") : (lang==="en"?"Low buffer":"Cuscinetto basso")) : "—");
+
+  // Recommendations
+  const recs = [];
+  recs.push({t: (isFinite(r.NPV) && r.NPV>0) ? L.recNPV_OK : L.recNPV_KO, cls: (isFinite(r.NPV) && r.NPV>0) ? "ok":"bad"});
+  recs.push({t: (isFinite(r.CCC) && r.CCC<60) ? L.recCCC_OK : L.recCCC_KO, cls: (isFinite(r.CCC) && r.CCC<60) ? "ok":"warn"});
+  recs.push({t: (isFinite(r.ratio) && r.ratio>3) ? L.recSaaS_OK : L.recSaaS_KO, cls: (isFinite(r.ratio) && r.ratio>3) ? "ok":"warn"});
+  recs.push({t: (isFinite(r.stressEB) && r.stressEB>0) ? L.recStress_OK : L.recStress_KO, cls: (isFinite(r.stressEB) && r.stressEB>0) ? "ok":"bad"});
+
+  const recBox = $("recs");
+  recBox.innerHTML = "";
+  recs.forEach(x=>{
+    const div = document.createElement("div");
+    div.className = "rec";
+    div.innerHTML = `<div class="dot ${x.cls}"></div><div>${x.t}</div>`;
+    recBox.appendChild(div);
+  });
+
+  // Invest KPIs
+  setText("invNPV", fmtMoney(r.NPV, cur));
+  setText("invNPVd", isFinite(r.NPV) ? `WACC ${(r.s.wacc*100).toFixed(1)}% • ${r.NPV>0 ? "OK":"KO"}` : "—");
+  setText("invIRR", isFinite(r.IRR) ? fmtPct(r.IRR) : "N/A");
+  setText("invIRRd", isFinite(r.IRR) ? (r.IRR>=r.s.wacc ? (lang==="en"?"IRR ≥ WACC":"IRR ≥ WACC") : (lang==="en"?"IRR < WACC":"IRR < WACC")) : "—");
+  setText("invPB", r.pb===null ? (lang==="en"?"N/A":"N.D.") : (r.pb===0 ? "0" : `${r.pb} ${lang==="en"?"years":"anni"}`));
+  setText("invPBd", r.pb===null ? (lang==="en"?"Not recovered":"Non recupera") : (lang==="en"?"Cash break-even year":"Anno break-even cash"));
+  const eb1 = r.rows.length ? r.rows[0].ebitda : NaN;
+  setText("invEB1", fmtMoney(eb1, cur));
+  setText("invEB1d", lang==="en" ? "EBITDA Year 1" : "EBITDA anno 1");
+
+  // Invest table
+  let html = `<table style="width:100%;border-collapse:collapse;font-size:12px">
+    <thead><tr style="color:var(--muted)">
+      <th style="text-align:left;padding:6px;border-bottom:1px solid var(--line)">${lang==="en"?"Year":"Anno"}</th>
+      <th style="text-align:right;padding:6px;border-bottom:1px solid var(--line)">${lang==="en"?"Revenue":"Ricavi"}</th>
+      <th style="text-align:right;padding:6px;border-bottom:1px solid var(--line)">EBITDA</th>
+      <th style="text-align:right;padding:6px;border-bottom:1px solid var(--line)">NOPAT</th>
+      <th style="text-align:right;padding:6px;border-bottom:1px solid var(--line)">FCF</th>
+    </tr></thead><tbody>`;
+  r.rows.forEach(row=>{
+    html += `<tr>
+      <td style="padding:6px;border-bottom:1px solid rgba(35,48,68,.55)">${row.year}</td>
+      <td style="padding:6px;border-bottom:1px solid rgba(35,48,68,.55);text-align:right">${fmtMoney(row.revenue, cur)}</td>
+      <td style="padding:6px;border-bottom:1px solid rgba(35,48,68,.55);text-align:right">${fmtMoney(row.ebitda, cur)}</td>
+      <td style="padding:6px;border-bottom:1px solid rgba(35,48,68,.55);text-align:right">${fmtMoney(row.nopat, cur)}</td>
+      <td style="padding:6px;border-bottom:1px solid rgba(35,48,68,.55);text-align:right">${fmtMoney(row.fcf, cur)}</td>
+    </tr>`;
+  });
+  html += `</tbody></table>`;
+  $("invTable").innerHTML = html;
+
+  // SaaS KPIs
+  setText("mSaasLTV", isFinite(r.LTV) ? fmtMoney(r.LTV, cur) : "—");
+  setText("mSaasLTVd", lang==="en" ? "Simplified LTV" : "LTV semplificato");
+  setText("mSaasRatio", isFinite(r.ratio) ? `${r.ratio.toFixed(1)}x` : "—");
+  setText("mSaasRatiod", isFinite(r.ratio) ? (r.ratio>3 ? "Elite" : (r.ratio<1 ? (lang==="en"?"Critical":"Critico") : "Low")) : "—");
+  const saasRecs = $("saasRecs");
+  saasRecs.innerHTML = "";
+  if(isFinite(r.ratio)){
+    const cls = r.ratio>3 ? "ok" : (r.ratio<1 ? "bad" : "warn");
+    const txt = r.ratio>3 ? (lang==="en"?"🚀 Healthy SaaS engine.":"🚀 Motore SaaS sano.") :
+                (r.ratio<1 ? (lang==="en"?"❌ Losing money per customer.":"❌ Perdi soldi per cliente.") :
+                             (lang==="en"?"⚠️ Improve to reach LTV/CAC > 3x.":"⚠️ Migliorare verso LTV/CAC > 3x."));
+    const div = document.createElement("div"); div.className="rec"; div.innerHTML = `<div class="dot ${cls}"></div><div>${txt}</div>`;
+    saasRecs.appendChild(div);
+  }
+
+  // Liquidity KPIs
+  $("liq_ccc_ro").value = isFinite(r.CCC) ? `${r.CCC.toFixed(0)} ${lang==="en"?"days":"gg"}` : "—";
+  setText("mLiqPFN", fmtMoney(r.PFN, cur));
+  setText("mLiqPFNd", r.PFN>0 ? (lang==="en"?"Net debt":"Debito netto") : (lang==="en"?"Net cash":"Cassa netta"));
+  setText("mLiqCCC", isFinite(r.CCC) ? `${r.CCC.toFixed(0)} ${lang==="en"?"days":"gg"}` : "—");
+  setText("mLiqCCCd", isFinite(r.CCC) ? (r.CCC<45 ? "Good" : (r.CCC<60 ? (lang==="en"?"Watch":"Attenzione") : "High")) : "—");
+
+  const liqRecs = $("liqRecs");
+  liqRecs.innerHTML = "";
+  if(isFinite(r.CCC)){
+    const cls = r.CCC<45 ? "ok" : (r.CCC<60 ? "warn" : "bad");
+    const txt = r.CCC<45 ? (lang==="en"?"💧 Efficient cash cycle.":"💧 Ciclo cassa efficiente.") :
+                (r.CCC<60 ? (lang==="en"?"⚠️ Monitor working capital drivers.":"⚠️ Monitorare DSO/DIO/DPO.") :
+                            (lang==="en"?"❌ High cash cycle → immediate actions needed.":"❌ Ciclo cassa alto → azioni immediate."));
+    const div = document.createElement("div"); div.className="rec"; div.innerHTML = `<div class="dot ${cls}"></div><div>${txt}</div>`;
+    liqRecs.appendChild(div);
+  }
+
+  // BEP KPIs
+  setText("mBepMC", fmtMoney(r.mc, cur));
+  setText("mBepMCd", lang==="en" ? "Unit contribution margin" : "Margine contribuzione unitario");
+  setText("mBepUnits", isFinite(r.bepUnits) ? r.bepUnits.toFixed(0) : "—");
+  setText("mBepUnitsd", lang==="en" ? "Units to break-even" : "Unità per pareggio");
+  setText("mBepValue", fmtMoney(r.bepValue, cur));
+  setText("mBepValued", lang==="en" ? "Minimum revenue" : "Fatturato minimo");
+  setText("mBepSafety", isFinite(r.safety) ? fmtPct(r.safety) : "—");
+  setText("mBepSafetyd", isFinite(r.safety) ? (r.safety>0.2 ? (lang==="en"?"Good":"Buono") : (lang==="en"?"Low":"Basso")) : "—");
+
+  const bepRecs = $("bepRecs");
+  bepRecs.innerHTML = "";
+  if(isFinite(r.safety)){
+    const cls = r.safety>0.2 ? "ok" : (r.safety>0.1 ? "warn" : "bad");
+    const txt = r.safety>0.2 ? (lang==="en"?"🎯 Strong safety margin (>20%).":"🎯 Margine di sicurezza solido (>20%).") :
+                (r.safety>0.1 ? (lang==="en"?"⚠️ Medium safety margin.":"⚠️ Margine medio.") :
+                                (lang==="en"?"❌ Low safety margin.":"❌ Margine basso."));
+    const div = document.createElement("div"); div.className="rec"; div.innerHTML = `<div class="dot ${cls}"></div><div>${txt}</div>`;
+    bepRecs.appendChild(div);
+  }
+
+  // Stress KPIs
+  setText("mStBase", fmtMoney(r.baseEB, cur));
+  setText("mStBased", lang==="en" ? "Base case" : "Scenario base");
+  setText("mStStress", fmtMoney(r.stressEB, cur));
+  setText("mStStressd", lang==="en" ? "Stressed case" : "Scenario stress");
+
+  const stressRecs = $("stressRecs");
+  stressRecs.innerHTML = "";
+  if(isFinite(r.stressEB)){
+    const cls = r.stressEB>0 ? "ok" : "bad";
+    const txt = r.stressEB>0 ? (lang==="en"?"🛡️ Resilient under shock.":"🛡️ Resiliente allo shock.") :
+                              (lang==="en"?"🌪️ EBITDA turns negative → mitigations needed.":"🌪️ EBITDA negativo → servono mitigazioni.");
+    const div = document.createElement("div"); div.className="rec"; div.innerHTML = `<div class="dot ${cls}"></div><div>${txt}</div>`;
+    stressRecs.appendChild(div);
+  }
+
+  // Chart
+  drawChart(r);
+}
+
+/* -------------------------
+   Tabs
+-------------------------- */
+function setTab(tab){
+  document.querySelectorAll(".tabbtn").forEach(b=>b.classList.toggle("active", b.dataset.tab===tab));
+  ["summary","invest","saas","liq","bep","stress","glossary","compliance"].forEach(t=>{
+    $("tab-"+t).classList.toggle("hide", t!==tab);
+  });
+  $("chartBadge").textContent = tab==="summary" ? "Investments" : tab;
+  render(); // keep consistent
+}
+
+/* -------------------------
+   Exports
+-------------------------- */
+function exportCSV(){
+  const r = compute();
+  const cur = r.s.cur;
+  const lang = r.s.lang;
+  const lines = [
+    ["Metric","Value"],
+    ["Company", $("company").value],
+    ["Date", nowStamp()],
+    ["NPV", fmtMoney(r.NPV,cur)],
+    ["IRR", isFinite(r.IRR)?fmtPct(r.IRR):"N/A"],
+    ["Payback", (r.pb===null)?(lang==="en"?"N/A":"N.D."):String(r.pb)],
+    ["PFN", fmtMoney(r.PFN,cur)],
+    ["LTV", isFinite(r.LTV)?fmtMoney(r.LTV,cur):"—"],
+    ["LTV/CAC", isFinite(r.ratio)?(r.ratio.toFixed(2)+"x"):"—"],
+    ["CCC", isFinite(r.CCC)?r.CCC.toFixed(0):"—"],
+    ["BEP Value", fmtMoney(r.bepValue,cur)],
+    ["Safety Margin", isFinite(r.safety)?fmtPct(r.safety):"—"]
+  ];
+  const csv = lines.map(row=>row.map(x=>{
+    const s=String(x??"");
+    return /[",\n]/.test(s) ? `"${s.replaceAll('"','""')}"` : s;
+  }).join(",")).join("\n");
+
+  const blob = new Blob([csv],{type:"text/csv;charset=utf-8"});
+  const a = document.createElement("a");
+  a.href = URL.createObjectURL(blob);
+  a.download = `${$("company").value}_CFOOS_Data.csv`.replaceAll(" ","_");
+  a.click();
+  URL.revokeObjectURL(a.href);
+}
+
+/* -------------------------
+   Offline persistence (optional)
+   Keeps inputs in localStorage so the app "remembers" even offline / reload.
+-------------------------- */
+const STORAGE_KEY = "cfo_os_offline_state_v1";
+function saveState(){
+  const ids = [
+    "langSel","company","currency",
+    "inv_capex","inv_years","inv_wacc","inv_tax","inv_rev1","inv_growth","inv_cogs","inv_opex1","inv_opexg",
+    "saas_arpu","saas_gm","saas_churn","saas_cac",
+    "liq_cash","liq_debt","liq_dso","liq_dio","liq_dpo",
+    "bep_price","bep_vc","bep_fc","bep_vol",
+    "st_rev","st_cost"
+  ];
+  const state = {};
+  ids.forEach(id=> state[id] = $(id).value);
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+}
+function loadState(){
+  try{
+    const raw = localStorage.getItem(STORAGE_KEY);
+    if(!raw) return;
+    const state = JSON.parse(raw);
+    Object.keys(state).forEach(id=>{
+      if($(id)) $(id).value = state[id];
+    });
+  }catch(e){}
+}
+
+/* -------------------------
+   Init
+-------------------------- */
+function hookEvents(){
+  document.querySelectorAll(".tabbtn").forEach(btn=>{
+    btn.addEventListener("click", ()=> setTab(btn.dataset.tab));
+  });
+
+  const ids = [
+    "langSel","company","currency",
+    "inv_capex","inv_years","inv_wacc","inv_tax","inv_rev1","inv_growth","inv_cogs","inv_opex1","inv_opexg",
+    "saas_arpu","saas_gm","saas_churn","saas_cac",
+    "liq_cash","liq_debt","liq_dso","liq_dio","liq_dpo",
+    "bep_price","bep_vc","bep_fc","bep_vol",
+    "st_rev","st_cost"
+  ];
+  ids.forEach(id=>{
+    $(id).addEventListener("input", ()=>{
+      applyLang();
+      render();
+      saveState();
+    });
+    $(id).addEventListener("change", ()=>{
+      applyLang();
+      render();
+      saveState();
+    });
+  });
+
+  $("btnCSV").addEventListener("click", exportCSV);
+  $("btnPrintPDF").addEventListener("click", ()=> window.print());
+
+  $("btnReset").addEventListener("click", ()=>{
+    // defaults
+    $("langSel").value="it";
+    $("company").value="Test";
+    $("currency").value="€";
+
+    $("inv_capex").value=500000; $("inv_years").value=5; $("inv_wacc").value=10; $("inv_tax").value=28;
+    $("inv_rev1").value=300000; $("inv_growth").value=15; $("inv_cogs").value=40; $("inv_opex1").value=50000; $("inv_opexg").value=3;
+
+    $("saas_arpu").value=500; $("saas_gm").value=0.85; $("saas_churn").value=2; $("saas_cac").value=4000;
+
+    $("liq_cash").value=150000; $("liq_debt").value=400000; $("liq_dso").value=60; $("liq_dio").value=45; $("liq_dpo").value=90;
+
+    $("bep_price").value=100; $("bep_vc").value=60; $("bep_fc").value=150000; $("bep_vol").value=5000;
+
+    $("st_rev").value=-20; $("st_cost").value=0;
+
+    applyLang(); render(); saveState();
+  });
+}
+
+/* Service worker register */
+if ("serviceWorker" in navigator) {
+  window.addEventListener("load", async () => {
+    try { await navigator.serviceWorker.register("./sw.js"); } catch(e){}
+  });
+}
+
+loadState();     // memory even offline / reload
+hookEvents();
+applyLang();
+render();
+setTab("summary");
+</script>
+</body>
+</html>
