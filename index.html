@@ -212,6 +212,7 @@
       <div class="tabbtn" data-tab="stress" id="tab_stress">🌪️ Stress Test</div>
       <div class="tabbtn" data-tab="glossary" id="tab_glossary">📘 Glossario</div>
       <div class="tabbtn" data-tab="compliance" id="tab_compliance">🛡️ Compliance</div>
+      <div class="tabbtn" data-tab="slides" id="tab_slides">🧩 Slides</div>
     </div>
 
     <!-- SUMMARY -->
@@ -498,7 +499,6 @@
       <div class="card">
         <h2><span id="cmpTitle">Compliance & Sicurezza</span><span class="badge ok" id="cmpBadge">Client-side</span></h2>
         <p class="sub" id="cmpSub">Vincoli per uso aziendale senza “sorprese”.</p>
-
         <div class="note" style="display:grid;gap:10px" id="cmpList"></div>
       </div>
 
@@ -521,22 +521,54 @@
       </div>
     </section>
 
+    <!-- SLIDES (OPTION 1) -->
+    <section id="tab-slides" class="grid hide">
+      <div class="card">
+        <h2>
+          <span id="slTitle">Slide Generator</span>
+          <span class="badge muted" id="slBadge">PPT-ready</span>
+        </h2>
+        <p class="sub" id="slSub">Testi automatici basati sui KPI: titoli e bullet pronti da incollare nelle slide.</p>
+
+        <div class="btns">
+          <button class="muted" id="btnGenSlides">✨ Genera contenuti</button>
+          <button class="muted" id="btnCopySlides">📋 Copia</button>
+          <button class="muted" id="btnDownloadSlides">⬇️ Scarica .txt</button>
+          <button class="muted" id="btnDownloadSlidesJson">⬇️ Scarica .json</button>
+        </div>
+
+        <div style="margin-top:12px" class="note" id="slNote">
+          Output offline: nessun dato viene trasmesso. Verifica e personalizza prima dell’uso in documenti ufficiali.
+        </div>
+      </div>
+
+      <div class="card">
+        <h2><span id="slOutTitle">Output</span><span class="badge muted mono" id="slFormat">Title + Bullets</span></h2>
+        <textarea id="slidesOutput"
+          style="width:100%;height:420px;background:rgba(15,23,42,.45);border:1px solid var(--line);border-radius:16px;padding:12px;color:var(--text);font-size:13px;line-height:1.4;resize:vertical"
+          placeholder="Premi “Genera contenuti”…"></textarea>
+        <div class="small" style="margin-top:8px" id="slTip">
+          Tip: in PowerPoint incolla come testo, poi applica il layout “Titolo e contenuto”.
+        </div>
+      </div>
+    </section>
+
     <div class="footer">
-      <div id="footLeft">Black Swan CFO OS — Offline • v1.0</div>
+      <div id="footLeft">Black Swan CFO OS — Offline • v1.1</div>
       <div id="footRight">Uso interno • Nessuna consulenza legale automatica</div>
     </div>
   </div>
 
 <script>
 /* -------------------------
-   Full i18n (practical coverage)
+   i18n
 -------------------------- */
 const I18N = {
   it: {
     appTitle: "BLACK SWAN — CFO OS (Offline)",
     appSub: "Offline-first: calcoli locali, niente server, niente dipendenze esterne.",
     labLang:"Lingua", labCompany:"Azienda", labCurrency:"Valuta",
-    tabs: {summary:"🏠 Summary", invest:"📊 Investimenti", saas:"🔄 SaaS", liq:"💧 Liquidità", bep:"🎯 Break-even", stress:"🌪️ Stress Test", glossary:"📘 Glossario", compliance:"🛡️ Compliance"},
+    tabs: {summary:"🏠 Summary", invest:"📊 Investimenti", saas:"🔄 SaaS", liq:"💧 Liquidità", bep:"🎯 Break-even", stress:"🌪️ Stress Test", glossary:"📘 Glossario", compliance:"🛡️ Compliance", slides:"🧩 Slides"},
     sumTitle:"Executive Dashboard",
     sumSub:"KPI e raccomandazioni. Tutto locale (client-side).",
     chartTitle:"📉 Flussi di cassa",
@@ -582,7 +614,7 @@ const I18N = {
     price:"Prezzo unit.", vc:"Costo var. unit.", fc:"Costi fissi", vol:"Volume (unità)",
     shockRev:"Shock ricavi %", shockCost:"Shock costi %",
 
-    // Tooltips (glossary-clean)
+    // Tooltips
     tNPV:"Somma dei flussi di cassa attualizzati al tasso di sconto.",
     tIRR:"Tasso interno di rendimento che annulla il NPV (NPV=0).",
     tPayback:"Periodo necessario a recuperare l’investimento iniziale.",
@@ -592,7 +624,7 @@ const I18N = {
     tBEP:"Break-even: costi fissi ÷ (prezzo − costo variabile), espresso anche in valore (fatturato).",
     tSafety:"(Vendite effettive − vendite BEP) / vendite effettive.",
 
-    // Recommendation strings
+    // Recommendations
     recNPV_OK:"✅ Semaforo Verde: il progetto crea valore economico.",
     recNPV_KO:"❌ Semaforo Rosso: il progetto non copre il costo del capitale.",
     recCCC_OK:"💧 Liquidità: ciclo cassa sotto controllo.",
@@ -602,18 +634,30 @@ const I18N = {
     recStress_OK:"🛡️ Stress test: EBITDA positivo anche in shock.",
     recStress_KO:"🌪️ Stress test: EBITDA negativo in shock → mitigazioni urgenti.",
 
-    // CSV/PDF buttons
+    // Buttons
     btnPrint:"📕 PDF (Stampa)",
     btnCSV:"📗 Export CSV",
     btnReset:"↩ Reset",
-    noteLocal:"✅ Offline-ready: nessun dato esce dal browser."
+    noteLocal:"✅ Offline-ready: nessun dato esce dal browser.",
+
+    // Slides
+    slTitle:"Slide Generator",
+    slSub:"Testi automatici basati sui KPI: titoli e bullet pronti da incollare nelle slide.",
+    slNote:"Output offline: nessun dato viene trasmesso. Verifica e personalizza prima dell’uso in documenti ufficiali.",
+    slOutTitle:"Output",
+    slTip:"Tip: in PowerPoint incolla come testo, poi applica il layout “Titolo e contenuto”.",
+    btnGenSlides:"✨ Genera contenuti",
+    btnCopySlides:"📋 Copia",
+    btnDownloadSlides:"⬇️ Scarica .txt",
+    btnDownloadSlidesJson:"⬇️ Scarica .json",
+    copied:"Copiato negli appunti."
   },
 
   en: {
     appTitle: "BLACK SWAN — CFO OS (Offline)",
     appSub: "Offline-first: local calculations, no servers, no external dependencies.",
     labLang:"Language", labCompany:"Company", labCurrency:"Currency",
-    tabs: {summary:"🏠 Summary", invest:"📊 Investments", saas:"🔄 SaaS", liq:"💧 Liquidity", bep:"🎯 Break-even", stress:"🌪️ Stress Test", glossary:"📘 Glossary", compliance:"🛡️ Compliance"},
+    tabs: {summary:"🏠 Summary", invest:"📊 Investments", saas:"🔄 SaaS", liq:"💧 Liquidity", bep:"🎯 Break-even", stress:"🌪️ Stress Test", glossary:"📘 Glossary", compliance:"🛡️ Compliance", slides:"🧩 Slides"},
     sumTitle:"Executive Dashboard",
     sumSub:"KPIs and recommendations. Everything runs locally (client-side).",
     chartTitle:"📉 Cash flows",
@@ -679,7 +723,18 @@ const I18N = {
     btnPrint:"📕 PDF (Print)",
     btnCSV:"📗 Export CSV",
     btnReset:"↩ Reset",
-    noteLocal:"✅ Offline-ready: no data leaves your browser."
+    noteLocal:"✅ Offline-ready: no data leaves your browser.",
+
+    slTitle:"Slide Generator",
+    slSub:"Auto-generated text based on KPIs: PPT-ready titles and bullets.",
+    slNote:"Offline output: no data is transmitted. Review and tailor before using in official documents.",
+    slOutTitle:"Output",
+    slTip:"Tip: in PowerPoint paste as text, then apply the “Title and Content” layout.",
+    btnGenSlides:"✨ Generate content",
+    btnCopySlides:"📋 Copy",
+    btnDownloadSlides:"⬇️ Download .txt",
+    btnDownloadSlidesJson:"⬇️ Download .json",
+    copied:"Copied to clipboard."
   }
 };
 
@@ -696,15 +751,15 @@ const fmtMoney = (x, cur) => {
   return `${sign}${cur} ${v.toLocaleString(undefined,{maximumFractionDigits:0})}`;
 };
 const fmtPct = (x) => isFinite(x) ? (x*100).toFixed(1) + "%" : "—";
+function moneyPlain(x, cur){ return isFinite(x) ? `${x<0?'-':''}${cur} ${Math.abs(x).toLocaleString(undefined,{maximumFractionDigits:0})}` : "N/A"; }
+function pctPlain(x){ return isFinite(x) ? (x*100).toFixed(1) + "%" : "N/A"; }
 
 /* -------------------------
-   Finance (transparent)
+   Finance
 -------------------------- */
 function npv(rate, cfs){
   let s = 0;
-  for(let t=0;t<cfs.length;t++){
-    s += cfs[t] / Math.pow(1+rate, t);
-  }
+  for(let t=0;t<cfs.length;t++) s += cfs[t] / Math.pow(1+rate, t);
   return s;
 }
 function irr(cfs, guess=0.1){
@@ -736,7 +791,7 @@ function paybackYear(cfs){
 }
 
 /* -------------------------
-   Glossary (language-aware)
+   Glossary
 -------------------------- */
 function getGlossary(lang){
   if(lang==="en"){
@@ -770,7 +825,7 @@ function getGlossary(lang){
 }
 
 /* -------------------------
-   Input / Compute
+   Inputs / Compute
 -------------------------- */
 function getInputs(){
   return {
@@ -810,7 +865,7 @@ function getInputs(){
 
 function compute(){
   const s = getInputs();
-  const da = s.capex / s.years; // linear amortization (simplified)
+  const da = s.capex / s.years;
   const cfs = [-s.capex];
   const rows = [];
 
@@ -857,13 +912,12 @@ function compute(){
 }
 
 /* -------------------------
-   Simple Canvas chart (FCF bars + cumulative line)
+   Simple Canvas chart
 -------------------------- */
 function drawChart(r){
   const canvas = $("cfCanvas");
   const ctx = canvas.getContext("2d");
 
-  // resize to actual pixels for sharpness
   const rect = canvas.getBoundingClientRect();
   canvas.width = Math.floor(rect.width * devicePixelRatio);
   canvas.height = Math.floor(rect.height * devicePixelRatio);
@@ -872,12 +926,10 @@ function drawChart(r){
   const w = rect.width, h = rect.height;
   ctx.clearRect(0,0,w,h);
 
-  // padding
   const padL = 46, padR = 16, padT = 18, padB = 36;
   const innerW = w - padL - padR;
   const innerH = h - padT - padB;
 
-  // data
   const bars = r.cfs.slice(1);
   const line = r.cum.slice(1);
   const n = Math.max(1, bars.length);
@@ -890,23 +942,19 @@ function drawChart(r){
   const yToPx = (v) => padT + (maxV - v) * (innerH / (maxV - minV));
   const xStep = innerW / n;
 
-  // grid + axes
   ctx.strokeStyle = "rgba(148,163,184,0.25)";
   ctx.lineWidth = 1;
   ctx.beginPath();
-  // baseline zero
   const y0 = yToPx(0);
   ctx.moveTo(padL, y0);
   ctx.lineTo(padL + innerW, y0);
   ctx.stroke();
 
-  // left axis label (min/max)
   ctx.fillStyle = "rgba(148,163,184,0.9)";
   ctx.font = "12px system-ui";
   ctx.fillText(maxV.toFixed(0), 6, padT+10);
   ctx.fillText(minV.toFixed(0), 6, padT+innerH);
 
-  // bars
   for(let i=0;i<n;i++){
     const x = padL + i*xStep + xStep*0.18;
     const bw = xStep*0.64;
@@ -919,13 +967,11 @@ function drawChart(r){
     ctx.fillStyle = "rgba(59,130,246,0.85)";
     ctx.fillRect(x, top, bw, bh);
 
-    // x labels
     ctx.fillStyle = "rgba(148,163,184,0.9)";
     ctx.font = "11px system-ui";
     ctx.fillText("Y"+(i+1), x + bw/2 - 10, padT + innerH + 22);
   }
 
-  // cumulative line
   ctx.strokeStyle = "rgba(239,68,68,0.95)";
   ctx.lineWidth = 2.5;
   ctx.beginPath();
@@ -937,13 +983,160 @@ function drawChart(r){
   }
   ctx.stroke();
 
-  // markers
   ctx.fillStyle = "rgba(239,68,68,1)";
   for(let i=0;i<n;i++){
     const x = padL + i*xStep + xStep/2;
     const y = yToPx(line[i] ?? 0);
     ctx.beginPath(); ctx.arc(x,y,3.2,0,Math.PI*2); ctx.fill();
   }
+}
+
+/* -------------------------
+   Slides Generator (Option 1)
+-------------------------- */
+function buildSlides(r){
+  const lang = r.s.lang;
+  const cur = r.s.cur;
+
+  const npvOk = isFinite(r.NPV) && r.NPV > 0;
+  const irrOk = isFinite(r.IRR) && r.IRR >= r.s.wacc;
+
+  const ltvOk = isFinite(r.ratio) && r.ratio >= 3;
+  const cccHigh = isFinite(r.CCC) && r.CCC >= 60;
+  const stressOk = isFinite(r.stressEB) && r.stressEB > 0;
+  const safetyLow = isFinite(r.safety) && r.safety < 0.10;
+
+  const company = ($("company").value || (lang==="en"?"Company":"Azienda")).trim();
+
+  if(lang === "en"){
+    return [
+      {
+        title: `${company} — Executive Summary`,
+        bullets: [
+          `NPV: ${moneyPlain(r.NPV,cur)} at WACC ${pctPlain(r.s.wacc)}.`,
+          `IRR: ${pctPlain(r.IRR)} (${irrOk ? "above" : "below"} WACC).`,
+          `Payback: ${r.pb===null ? "N/A" : r.pb + " years"}.`,
+          `Recommendation: ${npvOk && irrOk ? "Proceed (value-creating)." : "Rework / stop (does not meet hurdle rate)."}`
+        ]
+      },
+      {
+        title: "Investment economics",
+        bullets: [
+          `Year-1 EBITDA: ${moneyPlain(r.rows?.[0]?.ebitda ?? NaN,cur)}.`,
+          `Cash profile: cumulative breakeven in year ${r.pb===null ? "N/A" : r.pb}.`,
+          `Key sensitivities: revenue growth, COGS%, opex trajectory, WACC.`,
+          `Model note: simplified FCFF (no working capital / maintenance capex).`
+        ]
+      },
+      {
+        title: "Liquidity & working capital (signals)",
+        bullets: [
+          `Net Financial Position (PFN): ${moneyPlain(r.PFN,cur)} (${r.PFN>0 ? "net debt" : "net cash"}).`,
+          `CCC: ${isFinite(r.CCC) ? r.CCC.toFixed(0)+" days" : "N/A"} (${cccHigh ? "elevated" : "manageable"}).`,
+          `${cccHigh ? "Actions: reduce DSO, optimize inventory, renegotiate DPO." : "Maintain discipline on DSO/DIO/DPO."}`
+        ]
+      },
+      {
+        title: "SaaS efficiency (if applicable)",
+        bullets: [
+          `LTV/CAC: ${isFinite(r.ratio) ? r.ratio.toFixed(1)+"x" : "N/A"} (${ltvOk ? "healthy" : "needs improvement"}).`,
+          `Levers: reduce churn, improve gross margin, optimize CAC channels.`,
+          `Target: LTV/CAC > 3x with CAC payback under policy.`
+        ]
+      },
+      {
+        title: "Break-even & risk buffers",
+        bullets: [
+          `Break-even revenue: ${moneyPlain(r.bepValue,cur)}.`,
+          `Safety margin: ${isFinite(r.safety) ? pctPlain(r.safety) : "N/A"} (${safetyLow ? "low" : "adequate"}).`,
+          `${safetyLow ? "Risk: limited buffer → pricing/cost actions required." : "Buffer acceptable → monitor volume/pricing."}`
+        ]
+      },
+      {
+        title: "Stress test",
+        bullets: [
+          `Base EBITDA (Y1): ${moneyPlain(r.baseEB,cur)}.`,
+          `Stressed EBITDA (Y1): ${moneyPlain(r.stressEB,cur)} (${stressOk ? "still positive" : "negative"}).`,
+          `${stressOk ? "Mitigation: maintain contingency plan." : "Mitigation: cut opex, reprice, phase capex, secure liquidity."}`
+        ]
+      }
+    ];
+  }
+
+  return [
+    {
+      title: `${company} — Sintesi esecutiva`,
+      bullets: [
+        `NPV: ${moneyPlain(r.NPV,cur)} con WACC ${pctPlain(r.s.wacc)}.`,
+        `IRR: ${pctPlain(r.IRR)} (${irrOk ? "sopra" : "sotto"} WACC).`,
+        `Payback: ${r.pb===null ? "N.D." : r.pb + " anni"}.`,
+        `Raccomandazione: ${npvOk && irrOk ? "Procedere (creazione di valore)." : "Rivedere/fermarsi (non supera l’hurdle rate)."}`
+      ]
+    },
+    {
+      title: "Economics dell’investimento",
+      bullets: [
+        `EBITDA anno 1: ${moneyPlain(r.rows?.[0]?.ebitda ?? NaN,cur)}.`,
+        `Profilo cassa: break-even cumulato nell’anno ${r.pb===null ? "N.D." : r.pb}.`,
+        `Sensibilità: crescita ricavi, COGS%, traiettoria opex, WACC.`,
+        `Nota modello: FCFF semplificato (no capitale circolante / capex mantenimento).`
+      ]
+    },
+    {
+      title: "Liquidità & ciclo operativo (segnali)",
+      bullets: [
+        `PFN: ${moneyPlain(r.PFN,cur)} (${r.PFN>0 ? "debito netto" : "cassa netta"}).`,
+        `CCC: ${isFinite(r.CCC) ? r.CCC.toFixed(0)+" gg" : "N.D."} (${cccHigh ? "elevato" : "gestibile"}).`,
+        `${cccHigh ? "Azioni: ridurre DSO, ottimizzare scorte, rinegoziare DPO." : "Mantenere disciplina su DSO/DIO/DPO."}`
+      ]
+    },
+    {
+      title: "Efficienza SaaS (se applicabile)",
+      bullets: [
+        `LTV/CAC: ${isFinite(r.ratio) ? r.ratio.toFixed(1)+"x" : "N.D."} (${ltvOk ? "sano" : "da migliorare"}).`,
+        `Leve: riduzione churn, aumento margine lordo, ottimizzazione canali CAC.`,
+        `Target: LTV/CAC > 3x con payback CAC entro policy.`
+      ]
+    },
+    {
+      title: "Break-even & buffer di rischio",
+      bullets: [
+        `BEP (fatturato): ${moneyPlain(r.bepValue,cur)}.`,
+        `Margine di sicurezza: ${isFinite(r.safety) ? pctPlain(r.safety) : "N.D."} (${safetyLow ? "basso" : "adeguato"}).`,
+        `${safetyLow ? "Rischio: buffer limitato → azioni su prezzi/costi." : "Buffer adeguato → monitor volume/prezzo."}`
+      ]
+    },
+    {
+      title: "Stress test",
+      bullets: [
+        `EBITDA base (Y1): ${moneyPlain(r.baseEB,cur)}.`,
+        `EBITDA stress (Y1): ${moneyPlain(r.stressEB,cur)} (${stressOk ? "ancora positivo" : "negativo"}).`,
+        `${stressOk ? "Mitigazione: mantenere contingency plan." : "Mitigazione: ridurre opex, repricing, scaglionare capex, rafforzare liquidità."}`
+      ]
+    }
+  ];
+}
+function slidesToText(slides){
+  return slides.map((s, idx) => {
+    const bullets = s.bullets.map(b => `• ${b}`).join("\n");
+    return `${idx+1}) ${s.title}\n${bullets}\n`;
+  }).join("\n");
+}
+function downloadText(filename, text){
+  const blob = new Blob([text], {type:"text/plain;charset=utf-8"});
+  const a = document.createElement("a");
+  a.href = URL.createObjectURL(blob);
+  a.download = filename;
+  a.click();
+  URL.revokeObjectURL(a.href);
+}
+function downloadJson(filename, obj){
+  const blob = new Blob([JSON.stringify(obj,null,2)], {type:"application/json;charset=utf-8"});
+  const a = document.createElement("a");
+  a.href = URL.createObjectURL(blob);
+  a.download = filename;
+  a.click();
+  URL.revokeObjectURL(a.href);
 }
 
 /* -------------------------
@@ -967,14 +1160,12 @@ function applyLang(){
   const lang = $("langSel").value;
   const L = I18N[lang];
 
-  // Header
   setText("appTitle", L.appTitle);
   setText("appSub", L.appSub);
   setText("labLang", L.labLang);
   setText("labCompany", L.labCompany);
   setText("labCurrency", L.labCurrency);
 
-  // Tabs
   setText("tab_summary", L.tabs.summary);
   setText("tab_invest", L.tabs.invest);
   setText("tab_saas", L.tabs.saas);
@@ -983,14 +1174,13 @@ function applyLang(){
   setText("tab_stress", L.tabs.stress);
   setText("tab_glossary", L.tabs.glossary);
   setText("tab_compliance", L.tabs.compliance);
+  setText("tab_slides", L.tabs.slides);
 
-  // Summary
   setText("sumTitle", L.sumTitle);
   setText("sumSub", L.sumSub);
   setText("chartTitle", L.chartTitle);
   setText("chartSub", L.chartSub);
 
-  // Labels (summary)
   setText("kNPV", L.kNPV);
   setText("kIRR", L.kIRR);
   setText("kPayback", L.kPayback);
@@ -1000,7 +1190,6 @@ function applyLang(){
   setText("kBEP", L.kBEP);
   setText("kSafety", L.kSafety);
 
-  // Tooltips
   setTitle("tNPV", L.tNPV);
   setTitle("tIRR", L.tIRR);
   setTitle("tPayback", L.tPayback);
@@ -1010,7 +1199,6 @@ function applyLang(){
   setTitle("tBEP", L.tBEP);
   setTitle("tSafety", L.tSafety);
 
-  // Invest labels
   setText("invTitle", L.invTitle);
   setText("invSub", L.invSub);
   setText("invTableTitle", L.invTableTitle);
@@ -1025,7 +1213,6 @@ function applyLang(){
   setText("labOpex1", L.opex1);
   setText("labOpexG", L.opexg);
 
-  // SaaS
   setText("saasTitle", L.saasTitle);
   setText("saasSub", L.saasSub);
   setText("saasNote", L.saasNote);
@@ -1034,7 +1221,6 @@ function applyLang(){
   setText("labChurn", L.churn);
   setText("labCAC", L.cac);
 
-  // Liquidity
   setText("liqTitle", L.liqTitle);
   setText("liqSub", L.liqSub);
   setText("labCash", L.cash);
@@ -1043,7 +1229,6 @@ function applyLang(){
   setText("labDIO", L.dio);
   setText("labDPO", L.dpo);
 
-  // BEP
   setText("bepTitle", L.bepTitle);
   setText("bepSub", L.bepSub);
   setText("labPrice", L.price);
@@ -1051,21 +1236,18 @@ function applyLang(){
   setText("labFC", L.fc);
   setText("labVol", L.vol);
 
-  // Stress
   setText("stressTitle", L.stressTitle);
   setText("stressSub", L.stressSub);
   setText("stressNote", L.stressNote);
   setText("labShockRev", L.shockRev);
   setText("labShockCost", L.shockCost);
 
-  // Glossary
   setText("glTitle", L.glTitle);
   setText("glSub", L.glSub);
   setText("glWaccSub", L.glWaccSub);
   setText("glLegend", L.glLegend);
   setText("glLegendBody", L.glLegendBody);
 
-  // Compliance
   setText("cmpTitle", L.cmpTitle);
   setText("cmpSub", L.cmpSub);
   const cmpBox = $("cmpList");
@@ -1081,14 +1263,23 @@ function applyLang(){
   setText("intPatternBody", L.intPatternBody);
   setText("intExample", L.intExample);
 
-  // Buttons + note
   setText("btnPrintPDF", L.btnPrint);
   setText("btnCSV", L.btnCSV);
   setText("btnReset", L.btnReset);
   setText("noteLocal", L.noteLocal);
   setText("footRight", L.footRight);
 
-  // Render glossary list
+  // Slides
+  setText("slTitle", L.slTitle);
+  setText("slSub", L.slSub);
+  setText("slNote", L.slNote);
+  setText("slOutTitle", L.slOutTitle);
+  setText("slTip", L.slTip);
+  setText("btnGenSlides", L.btnGenSlides);
+  setText("btnCopySlides", L.btnCopySlides);
+  setText("btnDownloadSlides", L.btnDownloadSlides);
+  setText("btnDownloadSlidesJson", L.btnDownloadSlidesJson);
+
   renderGlossary(lang);
 }
 
@@ -1100,7 +1291,6 @@ function render(){
 
   setText("runStamp", nowStamp());
 
-  // Summary metrics
   setText("mNPV", fmtMoney(r.NPV, cur));
   setText("mIRR", isFinite(r.IRR) ? fmtPct(r.IRR) : "N/A");
   setText("mPayback", r.pb===null ? (lang==="en" ? "N/A" : "N.D.") : (r.pb===0 ? "0" : `${r.pb} ${lang==="en"?"years":"anni"}`));
@@ -1121,10 +1311,16 @@ function render(){
 
   // Recommendations
   const recs = [];
-  recs.push({t: (isFinite(r.NPV) && r.NPV>0) ? L.recNPV_OK : L.recNPV_KO, cls: (isFinite(r.NPV) && r.NPV>0) ? "ok":"bad"});
-  recs.push({t: (isFinite(r.CCC) && r.CCC<60) ? L.recCCC_OK : L.recCCC_KO, cls: (isFinite(r.CCC) && r.CCC<60) ? "ok":"warn"});
-  recs.push({t: (isFinite(r.ratio) && r.ratio>3) ? L.recSaaS_OK : L.recSaaS_KO, cls: (isFinite(r.ratio) && r.ratio>3) ? "ok":"warn"});
-  recs.push({t: (isFinite(r.stressEB) && r.stressEB>0) ? L.recStress_OK : L.recStress_KO, cls: (isFinite(r.stressEB) && r.stressEB>0) ? "ok":"bad"});
+  const npvOk = isFinite(r.NPV) && r.NPV>0;
+  const irrOk = isFinite(r.IRR) && r.IRR>=r.s.wacc;
+  const cccOk = isFinite(r.CCC) && r.CCC<60;
+  const ltvOk = isFinite(r.ratio) && r.ratio>3;
+  const stressOk = isFinite(r.stressEB) && r.stressEB>0;
+
+  recs.push({t: (npvOk && irrOk) ? L.recNPV_OK : L.recNPV_KO, cls: (npvOk && irrOk) ? "ok":"bad"});
+  recs.push({t: cccOk ? L.recCCC_OK : L.recCCC_KO, cls: cccOk ? "ok":"warn"});
+  recs.push({t: ltvOk ? L.recSaaS_OK : L.recSaaS_KO, cls: ltvOk ? "ok":"warn"});
+  recs.push({t: stressOk ? L.recStress_OK : L.recStress_KO, cls: stressOk ? "ok":"bad"});
 
   const recBox = $("recs");
   recBox.innerHTML = "";
@@ -1172,16 +1368,6 @@ function render(){
   setText("mSaasLTVd", lang==="en" ? "Simplified LTV" : "LTV semplificato");
   setText("mSaasRatio", isFinite(r.ratio) ? `${r.ratio.toFixed(1)}x` : "—");
   setText("mSaasRatiod", isFinite(r.ratio) ? (r.ratio>3 ? "Elite" : (r.ratio<1 ? (lang==="en"?"Critical":"Critico") : "Low")) : "—");
-  const saasRecs = $("saasRecs");
-  saasRecs.innerHTML = "";
-  if(isFinite(r.ratio)){
-    const cls = r.ratio>3 ? "ok" : (r.ratio<1 ? "bad" : "warn");
-    const txt = r.ratio>3 ? (lang==="en"?"🚀 Healthy SaaS engine.":"🚀 Motore SaaS sano.") :
-                (r.ratio<1 ? (lang==="en"?"❌ Losing money per customer.":"❌ Perdi soldi per cliente.") :
-                             (lang==="en"?"⚠️ Improve to reach LTV/CAC > 3x.":"⚠️ Migliorare verso LTV/CAC > 3x."));
-    const div = document.createElement("div"); div.className="rec"; div.innerHTML = `<div class="dot ${cls}"></div><div>${txt}</div>`;
-    saasRecs.appendChild(div);
-  }
 
   // Liquidity KPIs
   $("liq_ccc_ro").value = isFinite(r.CCC) ? `${r.CCC.toFixed(0)} ${lang==="en"?"days":"gg"}` : "—";
@@ -1189,17 +1375,6 @@ function render(){
   setText("mLiqPFNd", r.PFN>0 ? (lang==="en"?"Net debt":"Debito netto") : (lang==="en"?"Net cash":"Cassa netta"));
   setText("mLiqCCC", isFinite(r.CCC) ? `${r.CCC.toFixed(0)} ${lang==="en"?"days":"gg"}` : "—");
   setText("mLiqCCCd", isFinite(r.CCC) ? (r.CCC<45 ? "Good" : (r.CCC<60 ? (lang==="en"?"Watch":"Attenzione") : "High")) : "—");
-
-  const liqRecs = $("liqRecs");
-  liqRecs.innerHTML = "";
-  if(isFinite(r.CCC)){
-    const cls = r.CCC<45 ? "ok" : (r.CCC<60 ? "warn" : "bad");
-    const txt = r.CCC<45 ? (lang==="en"?"💧 Efficient cash cycle.":"💧 Ciclo cassa efficiente.") :
-                (r.CCC<60 ? (lang==="en"?"⚠️ Monitor working capital drivers.":"⚠️ Monitorare DSO/DIO/DPO.") :
-                            (lang==="en"?"❌ High cash cycle → immediate actions needed.":"❌ Ciclo cassa alto → azioni immediate."));
-    const div = document.createElement("div"); div.className="rec"; div.innerHTML = `<div class="dot ${cls}"></div><div>${txt}</div>`;
-    liqRecs.appendChild(div);
-  }
 
   // BEP KPIs
   setText("mBepMC", fmtMoney(r.mc, cur));
@@ -1211,34 +1386,12 @@ function render(){
   setText("mBepSafety", isFinite(r.safety) ? fmtPct(r.safety) : "—");
   setText("mBepSafetyd", isFinite(r.safety) ? (r.safety>0.2 ? (lang==="en"?"Good":"Buono") : (lang==="en"?"Low":"Basso")) : "—");
 
-  const bepRecs = $("bepRecs");
-  bepRecs.innerHTML = "";
-  if(isFinite(r.safety)){
-    const cls = r.safety>0.2 ? "ok" : (r.safety>0.1 ? "warn" : "bad");
-    const txt = r.safety>0.2 ? (lang==="en"?"🎯 Strong safety margin (>20%).":"🎯 Margine di sicurezza solido (>20%).") :
-                (r.safety>0.1 ? (lang==="en"?"⚠️ Medium safety margin.":"⚠️ Margine medio.") :
-                                (lang==="en"?"❌ Low safety margin.":"❌ Margine basso."));
-    const div = document.createElement("div"); div.className="rec"; div.innerHTML = `<div class="dot ${cls}"></div><div>${txt}</div>`;
-    bepRecs.appendChild(div);
-  }
-
   // Stress KPIs
   setText("mStBase", fmtMoney(r.baseEB, cur));
   setText("mStBased", lang==="en" ? "Base case" : "Scenario base");
   setText("mStStress", fmtMoney(r.stressEB, cur));
   setText("mStStressd", lang==="en" ? "Stressed case" : "Scenario stress");
 
-  const stressRecs = $("stressRecs");
-  stressRecs.innerHTML = "";
-  if(isFinite(r.stressEB)){
-    const cls = r.stressEB>0 ? "ok" : "bad";
-    const txt = r.stressEB>0 ? (lang==="en"?"🛡️ Resilient under shock.":"🛡️ Resiliente allo shock.") :
-                              (lang==="en"?"🌪️ EBITDA turns negative → mitigations needed.":"🌪️ EBITDA negativo → servono mitigazioni.");
-    const div = document.createElement("div"); div.className="rec"; div.innerHTML = `<div class="dot ${cls}"></div><div>${txt}</div>`;
-    stressRecs.appendChild(div);
-  }
-
-  // Chart
   drawChart(r);
 }
 
@@ -1247,11 +1400,11 @@ function render(){
 -------------------------- */
 function setTab(tab){
   document.querySelectorAll(".tabbtn").forEach(b=>b.classList.toggle("active", b.dataset.tab===tab));
-  ["summary","invest","saas","liq","bep","stress","glossary","compliance"].forEach(t=>{
+  ["summary","invest","saas","liq","bep","stress","glossary","compliance","slides"].forEach(t=>{
     $("tab-"+t).classList.toggle("hide", t!==tab);
   });
   $("chartBadge").textContent = tab==="summary" ? "Investments" : tab;
-  render(); // keep consistent
+  render();
 }
 
 /* -------------------------
@@ -1289,8 +1442,7 @@ function exportCSV(){
 }
 
 /* -------------------------
-   Offline persistence (optional)
-   Keeps inputs in localStorage so the app "remembers" even offline / reload.
+   Offline persistence
 -------------------------- */
 const STORAGE_KEY = "cfo_os_offline_state_v1";
 function saveState(){
@@ -1300,7 +1452,8 @@ function saveState(){
     "saas_arpu","saas_gm","saas_churn","saas_cac",
     "liq_cash","liq_debt","liq_dso","liq_dio","liq_dpo",
     "bep_price","bep_vc","bep_fc","bep_vol",
-    "st_rev","st_cost"
+    "st_rev","st_cost",
+    "slidesOutput"
   ];
   const state = {};
   ids.forEach(id=> state[id] = $(id).value);
@@ -1350,7 +1503,6 @@ function hookEvents(){
   $("btnPrintPDF").addEventListener("click", ()=> window.print());
 
   $("btnReset").addEventListener("click", ()=>{
-    // defaults
     $("langSel").value="it";
     $("company").value="Test";
     $("currency").value="€";
@@ -1366,8 +1518,49 @@ function hookEvents(){
 
     $("st_rev").value=-20; $("st_cost").value=0;
 
+    $("slidesOutput").value = "";
+
     applyLang(); render(); saveState();
   });
+
+  // Slides
+  $("btnGenSlides").addEventListener("click", ()=>{
+    const r = compute();
+    const slides = buildSlides(r);
+    $("slidesOutput").value = slidesToText(slides);
+    saveState();
+  });
+
+  $("btnCopySlides").addEventListener("click", async ()=>{
+    const L = I18N[$("langSel").value];
+    const text = $("slidesOutput").value || "";
+    if(!text) return;
+    try{
+      await navigator.clipboard.writeText(text);
+      alert(L.copied);
+    }catch(e){
+      $("slidesOutput").select();
+      document.execCommand("copy");
+      alert(L.copied);
+    }
+  });
+
+  $("btnDownloadSlides").addEventListener("click", ()=>{
+    const company = ($("company").value || "Company").trim().replaceAll(" ","_");
+    const text = $("slidesOutput").value || "";
+    if(!text) return;
+    downloadText(`${company}_Slides.txt`, text);
+  });
+
+  $("btnDownloadSlidesJson").addEventListener("click", ()=>{
+    const r = compute();
+    const slides = buildSlides(r);
+    const company = ($("company").value || "Company").trim().replaceAll(" ","_");
+    downloadJson(`${company}_Slides.json`, {generatedAt: nowStamp(), company: $("company").value, slides});
+  });
+
+  // Redraw chart on resize
+  window.addEventListener("resize", ()=> render());
 }
 
 /* Service worker register */
@@ -1377,7 +1570,7 @@ if ("serviceWorker" in navigator) {
   });
 }
 
-loadState();     // memory even offline / reload
+loadState();
 hookEvents();
 applyLang();
 render();
